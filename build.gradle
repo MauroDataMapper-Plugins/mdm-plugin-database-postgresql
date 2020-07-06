@@ -19,9 +19,4 @@ buildscript {
     }
 }
 
-apply plugin: 'ox.softeng.ox-brc-root-project'
-
-apply from: "${projectDir}/gradle/allprojects.gradle"
-apply from: "${projectDir}/gradle/subprojects.gradle"
-
 apply plugin: "com.github.hierynomus.license"
