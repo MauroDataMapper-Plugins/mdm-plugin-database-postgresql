@@ -1,2 +1,9 @@
-# mc-impl-postgres
-Postgres utilities for the metadata catalogue
+# mdm-plugin-database-postgresql
+
+## Requirements
+
+* Java 12 (Java.net)
+* Grails 4.0.3+
+* Gradle 6.5+
+
+All of the above can be installed and easily maintained by using [SDKMAN!](https://sdkman.io/install).
