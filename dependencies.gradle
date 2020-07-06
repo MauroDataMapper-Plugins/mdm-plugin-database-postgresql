@@ -1,0 +1,5 @@
+dependencies {
+    if (rootProject == parent) implementation project(':mc-plugin-database')
+    else implementation project(':mc-plugins:mc-plugin-database')
+    implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
+}
