@@ -1,4 +1,4 @@
-package ox.softeng.metadatacatalogue.plugins.database.postgres.test
+package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.test
 
 import ox.softeng.metadatacatalogue.core.catalogue.linkable.component.DataClass
 import ox.softeng.metadatacatalogue.core.catalogue.linkable.datamodel.DataModel

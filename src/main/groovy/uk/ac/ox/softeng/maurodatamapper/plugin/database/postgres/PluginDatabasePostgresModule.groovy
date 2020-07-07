@@ -1,4 +1,4 @@
-package ox.softeng.metadatacatalogue.plugins.database.postgres
+package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
 import ox.softeng.metadatacatalogue.core.spi.module.AbstractModule
 
