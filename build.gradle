@@ -21,6 +21,8 @@ buildscript {
         // However without spring-core the license plugin won't work so we need to include it at the top level
         // this version will need to be kept inline with Grails' spring-core
         classpath "org.springframework:spring-core:$licenseGradlePluginSpringCoreOverrideVersion"
+
+        classpath "com.github.jengelman.gradle.plugins:shadow:$shadowGradlePluginVersion"
     }
     configurations.all {
         resolutionStrategy.cacheChangingModulesFor 0, TimeUnit.SECONDS // Check for updates every build
@@ -32,6 +34,8 @@ plugins {
 }
 
 apply plugin: 'ox.softeng.ox-brc-base'
+apply from: 'allprojects.gradle'
+apply from: 'subprojects.gradle'
 apply plugin: 'com.github.hierynomus.license'
 
 license {
