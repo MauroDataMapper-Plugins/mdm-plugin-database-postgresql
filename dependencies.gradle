@@ -1,4 +1,8 @@
 dependencies {
+    if (rootProject == parent) implementation project(':mdm-plugin-database')
+    else implementation project(':mdm-plugins:mdm-plugin-database')
+    implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
+
     /**
      * MDM Dependencies
      */
@@ -28,9 +32,4 @@ dependencies {
      */
     testImplementation group: 'junit', name: 'junit', version: junitVersion
     integrationTestImplementation group: 'org.flywaydb.flyway-test-extensions', name: 'flyway-spring-test', version: flywayVersion
-
-    if (rootProject == parent) implementation project(':mdm-plugin-database')
-    else implementation project(':mdm-plugins:mdm-plugin-database')
-
-    implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
 }
