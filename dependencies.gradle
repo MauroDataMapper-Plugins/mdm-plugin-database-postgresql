@@ -1,15 +1,14 @@
 dependencies {
-
     /**
-     * MC Dependencies
+     * MDM Dependencies
      */
     if (rootProject == parent) {
-        implementation group: 'ox.softeng.metadatacatalogue', name: 'mc-core', version: mcCoreVersion
+        implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-core', version: mdmCoreVersion
         testImplementation project(':test-utils')
     }
     else {
-        implementation project(':mc-core')
-        testImplementation project(':mc-plugins:test-utils')
+        implementation project(':mdm-core')
+        testImplementation project(':mdm-plugins:test-utils')
     }
 
     // Postgres database
@@ -30,7 +29,8 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: junitVersion
     integrationTestImplementation group: 'org.flywaydb.flyway-test-extensions', name: 'flyway-spring-test', version: flywayVersion
 
-    if (rootProject == parent) implementation project(':mc-plugin-database')
-    else implementation project(':mc-plugins:mc-plugin-database')
+    if (rootProject == parent) implementation project(':mdm-plugin-database')
+    else implementation project(':mdm-plugins:mdm-plugin-database')
+
     implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
 }
