@@ -1,8 +1,8 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres;
 
-import ox.softeng.metadatacatalogue.core.spi.importer.parameter.config.ImportGroupConfig;
-import ox.softeng.metadatacatalogue.core.spi.importer.parameter.config.ImportParameterConfig;
-import ox.softeng.metadatacatalogue.plugins.database.DatabaseImportParameters;
+import uk.ac.ox.softeng.maurodatamapper.core.spi.importer.parameter.config.ImportGroupConfig;
+import uk.ac.ox.softeng.maurodatamapper.core.spi.importer.parameter.config.ImportParameterConfig;
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.DatabaseImportParameters;
 
 import org.postgresql.ds.PGSimpleDataSource;
 

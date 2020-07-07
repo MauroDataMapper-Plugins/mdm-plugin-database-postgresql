@@ -1,11 +1,11 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.test
 
-import ox.softeng.metadatacatalogue.core.catalogue.linkable.component.DataClass
-import ox.softeng.metadatacatalogue.core.catalogue.linkable.datamodel.DataModel
-import ox.softeng.metadatacatalogue.core.facet.Metadata
-import ox.softeng.metadatacatalogue.plugins.database.postgres.PostgresDatabaseImportParameters
-import ox.softeng.metadatacatalogue.plugins.database.postgres.PostgresDatabaseImporterService
-import ox.softeng.metadatacatalogue.plugins.test.BaseDatabasePluginTest
+import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.DataClass
+import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.datamodel.DataModel
+import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseImportParameters
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseImporterService
+import uk.ac.ox.softeng.maurodatamapper.plugin.test.BaseDatabasePluginTest
 
 import org.junit.Test
 

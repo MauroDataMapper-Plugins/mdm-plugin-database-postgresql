@@ -1,7 +1,7 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import ox.softeng.metadatacatalogue.plugins.database.AbstractDatabaseImporter
-import ox.softeng.metadatacatalogue.plugins.database.RemoteDatabaseImporter
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.AbstractDatabaseImporter
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.RemoteDatabaseImporter
 
 import java.sql.Connection
 import java.sql.PreparedStatement

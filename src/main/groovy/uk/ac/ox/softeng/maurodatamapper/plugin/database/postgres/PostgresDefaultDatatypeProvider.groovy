@@ -1,8 +1,8 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import ox.softeng.metadatacatalogue.core.catalogue.linkable.component.datatype.DataType
-import ox.softeng.metadatacatalogue.core.catalogue.linkable.component.datatype.PrimitiveType
-import ox.softeng.metadatacatalogue.core.traits.spi.datatype.DefaultDataTypeProvider
+import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.datatype.DataType
+import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.datatype.PrimitiveType
+import uk.ac.ox.softeng.maurodatamapper.core.traits.spi.datatype.DefaultDataTypeProvider
 
 /**
  * @since 19/04/2018
