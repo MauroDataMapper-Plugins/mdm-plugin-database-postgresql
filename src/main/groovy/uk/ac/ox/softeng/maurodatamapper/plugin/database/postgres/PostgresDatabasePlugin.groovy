@@ -14,7 +14,7 @@ class PostgresDatabasePlugin extends AbstractMauroDataMapperPlugin {
     @Override
     Closure doWithSpring() {
         {->
-            postgresDatabaseImporterService(PostgresDatabaseDataModelImporterProviderService)
+            postgresDatabaseDataModelImporterProviderService(PostgresDatabaseDataModelImporterProviderService)
             postgresDefaultDatatypeProvider(PostgresDefaultDatatypeProvider)
         }
     }
