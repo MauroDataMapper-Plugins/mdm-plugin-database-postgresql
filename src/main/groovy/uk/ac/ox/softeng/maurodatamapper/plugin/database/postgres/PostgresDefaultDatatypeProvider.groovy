@@ -1,15 +1,15 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.PrimitiveType
 import uk.ac.ox.softeng.maurodatamapper.datamodel.provider.DefaultDataTypeProvider
+import uk.ac.ox.softeng.maurodatamapper.datamodel.rest.transport.DefaultDataType
 
 /**
  * @since 19/04/2018
  */
 class PostgresDefaultDatatypeProvider implements DefaultDataTypeProvider {
     @Override
-    List<DataType> getDefaultListOfDataTypes() {
+    List<DefaultDataType> getDefaultListOfDataTypes() {
         [
             new PrimitiveType(label: 'bigint', description: 'signed eight-byte integer'),
             new PrimitiveType(label: 'bigserial', description: 'autoincrementing eight-byte integer'),
@@ -57,7 +57,7 @@ class PostgresDefaultDatatypeProvider implements DefaultDataTypeProvider {
             new PrimitiveType(label: 'txid_snapshot', description: 'user-level transaction ID snapshot'),
             new PrimitiveType(label: 'uuid', description: 'universally unique identifier'),
             new PrimitiveType(label: 'xml', description: 'XML data'),
-        ]
+        ].collect { new DefaultDataType(it) }
     }
 
     @Override
