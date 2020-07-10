@@ -2,7 +2,7 @@ package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres;
 
 import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportGroupConfig;
 import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportParameterConfig;
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.DatabaseImportParameters;
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.DatabaseDataModelImporterProviderServiceParameters;
 
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,8 @@ import java.util.Properties;
 /**
  * Created by james on 31/05/2017.
  */
-public class PostgresDatabaseImportParameters extends DatabaseImportParameters<PGSimpleDataSource> {
+public class PostgresDatabaseDataModelImporterProviderServiceParameters
+    extends DatabaseDataModelImporterProviderServiceParameters<PGSimpleDataSource> {
 
     @Override
     public int getDefaultPort() {

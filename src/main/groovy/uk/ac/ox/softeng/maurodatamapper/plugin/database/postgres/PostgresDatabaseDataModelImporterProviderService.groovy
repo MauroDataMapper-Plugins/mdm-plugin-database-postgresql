@@ -1,7 +1,7 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.AbstractDatabaseImporter
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.RemoteDatabaseImporter
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.AbstractDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.RemoteDatabaseDataModelImporterProviderService
 
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -9,7 +9,9 @@ import java.sql.PreparedStatement
 /**
  * Created by james on 31/05/2017.
  */
-class PostgresDatabaseImporterService extends AbstractDatabaseImporter<PostgresDatabaseImportParameters> implements RemoteDatabaseImporter {
+class PostgresDatabaseDataModelImporterProviderService
+    extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
+    implements RemoteDatabaseDataModelImporterProviderService {
 
     public static final String IS_NOT_NULL_CONSTRAINT = 'IS NOT NULL'
 
@@ -105,7 +107,7 @@ WHERE constraint_type = 'FOREIGN KEY' AND tc.constraint_schema = ?;
     }
 
     @Override
-    PreparedStatement prepareCoreStatement(Connection connection, PostgresDatabaseImportParameters params) {
+    PreparedStatement prepareCoreStatement(Connection connection, PostgresDatabaseDataModelImporterProviderServiceParameters params) {
         PreparedStatement st
         if (params.schemaNames) {
             List<String> names = params.schemaNames.split(',')
