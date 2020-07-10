@@ -1,8 +1,8 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.datatype.DataType
-import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.datatype.PrimitiveType
-import uk.ac.ox.softeng.maurodatamapper.core.traits.spi.datatype.DefaultDataTypeProvider
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.PrimitiveType
+import uk.ac.ox.softeng.maurodatamapper.datamodel.provider.DefaultDataTypeProvider
 
 /**
  * @since 19/04/2018
@@ -63,5 +63,10 @@ class PostgresDefaultDatatypeProvider implements DefaultDataTypeProvider {
     @Override
     String getDisplayName() {
         'PostgreSQL 9 DataTypes'
+    }
+
+    @Override
+    String getVersion() {
+        return ''
     }
 }

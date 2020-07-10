@@ -1,7 +1,5 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.core.spi.module.AbstractModule
-
 /**
  * @since 17/08/2017
  */

@@ -1,10 +1,11 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres;
 
-import uk.ac.ox.softeng.maurodatamapper.core.spi.importer.parameter.config.ImportGroupConfig;
-import uk.ac.ox.softeng.maurodatamapper.core.spi.importer.parameter.config.ImportParameterConfig;
+import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportGroupConfig;
+import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportParameterConfig;
 import uk.ac.ox.softeng.maurodatamapper.plugin.database.DatabaseImportParameters;
 
 import org.postgresql.ds.PGSimpleDataSource;
+import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
@@ -40,7 +41,7 @@ public class PostgresDatabaseImportParameters extends DatabaseImportParameters<P
             dataSource.setSslMode("require");
         }
 
-        getLogger().info("DataSource connection url: {}", dataSource.getUrl());
+        LoggerFactory.getLogger(getClass()).info("DataSource connection url: {}", dataSource.getUrl());
 
         return dataSource;
     }

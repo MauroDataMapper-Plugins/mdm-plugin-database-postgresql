@@ -1,1 +1,3 @@
 rootProject.name = 'mdm-plugin-database-postgresql'
+
+includeBuild '../mdm-plugin-database'
