@@ -4,7 +4,7 @@ dependencies {
     implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-plugin-datamodel:4.0.0-SNAPSHOT'
     implementation 'uk.ac.ox.softeng.maurodatamapper.plugins:mdm-plugin-database:2.0.0-SNAPSHOT'
 
-    runtimeOnly group: 'org.postgresql', name: 'postgresql'
+    implementation group: 'org.postgresql', name: 'postgresql'
 
     implementation group: 'org.codehaus.groovy', name: 'groovy'
 
