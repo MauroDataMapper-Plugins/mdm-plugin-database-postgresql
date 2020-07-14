@@ -1,26 +1,29 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.test
 
-import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.component.DataClass
-import uk.ac.ox.softeng.maurodatamapper.core.catalogue.linkable.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderServiceParameters
+import uk.ac.ox.softeng.maurodatamapper.datamodel.Application
+import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderService
-import uk.ac.ox.softeng.maurodatamapper.plugin.test.BaseDatabasePluginTest
+import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderServiceParameters
+import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePluginTest
 
+import grails.boot.config.GrailsAutoConfiguration
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
-class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters, PostgresDatabaseDataModelImporterProviderService> {
+class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
+    PostgresDatabaseDataModelImporterProviderService> {
 
     @Override
     PostgresDatabaseDataModelImporterProviderServiceParameters createDatabaseImportParameters() {
         PostgresDatabaseDataModelImporterProviderServiceParameters params = new PostgresDatabaseDataModelImporterProviderServiceParameters()
-        params.setDatabaseName("metadatacatalogue_test")
-        params.setDatabaseUsername("metadatacatalogue")
-        params.setDatabasePassword("MetadataCatalogue1234")
+        params.setDatabaseName("maurodatamapper_test")
+        params.setDatabaseUsername("maurodatamapper")
+        params.setDatabasePassword("MauroDataMapper1234")
         return params
     }
 
@@ -52,13 +55,13 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         Set<DataClass> childDataClasses = dataModel.getChildDataClasses()
         DataClass publicSchema = childDataClasses.first()
 
-        assertEquals("Number of child tables/dataclasses", 3, publicSchema.getChildDataClasses()?.size())
+        assertEquals("Number of child tables/dataclasses", 3, publicSchema.getDataClasses()?.size())
 
-        Set<DataClass> dataClasses = publicSchema.childDataClasses
+        Set<DataClass> dataClasses = publicSchema.dataClasses
 
         // Tables
         DataClass metadataTable = dataClasses.find {it.label == "metadata"}
-        assertEquals("Metadata Number of columns/dataElements", 10, metadataTable.getChildDataElements().size())
+        assertEquals("Metadata Number of columns/dataElements", 10, metadataTable.dataElements.size())
         assertEquals("Metadata Number of metadata", 5, metadataTable.metadata.size())
 
         assertTrue("MD All metadata values are valid", metadataTable.metadata.every {it.value && it.key != it.value})
@@ -73,7 +76,7 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         assertEquals("Correct order of columns", 'catalogue_item_id, namespace, key', multipleColIndex.value)
 
         DataClass ciTable = dataClasses.find {it.label == "catalogue_item"}
-        assertEquals("CI Number of columns/dataElements", 10, ciTable.getChildDataElements().size())
+        assertEquals("CI Number of columns/dataElements", 10, ciTable.dataElements.size())
         assertEquals("CI Number of metadata", 4, ciTable.metadata.size())
 
         assertTrue("CI All metadata values are valid", ciTable.metadata.every {it.value && it.key != it.value})
@@ -84,7 +87,7 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
 
 
         DataClass cuTable = dataClasses.find {it.label == "catalogue_user"}
-        assertEquals("CU Number of columns/dataElements", 18, cuTable.getChildDataElements().size())
+        assertEquals("CU Number of columns/dataElements", 18, cuTable.dataElements.size())
         assertEquals("CU Number of metadata", 5, cuTable.metadata.size())
 
         assertTrue("CU All metadata values are valid", cuTable.metadata.every {it.value && it.key != it.value})
@@ -96,10 +99,15 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         assertEquals("Unique Constraint", 1, cuTable.metadata.count {it.key.startsWith 'unique['})
 
         // Columns
-        assertTrue("Metadata all elements required", metadataTable.childDataElements.every {it.minMultiplicity == 1})
-        assertEquals("CI mandatory elements", 9, ciTable.childDataElements.count {it.minMultiplicity == 1})
-        assertEquals("CI optional element description", 0, ciTable.findChildDataElement('description').minMultiplicity)
-        assertEquals("CU mandatory elements", 10, cuTable.childDataElements.count {it.minMultiplicity == 1})
+        assertTrue("Metadata all elements required", metadataTable.dataElements.every {it.minMultiplicity == 1})
+        assertEquals("CI mandatory elements", 9, ciTable.dataElements.count {it.minMultiplicity == 1})
+        assertEquals("CI optional element description", 0, ciTable.findDataElement('description').minMultiplicity)
+        assertEquals("CU mandatory elements", 10, cuTable.dataElements.count {it.minMultiplicity == 1})
 
+    }
+
+    @Override
+    Class<GrailsAutoConfiguration> getTestGrailsApplicationClass() {
+        Application
     }
 }

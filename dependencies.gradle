@@ -2,7 +2,9 @@ dependencies {
     implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-core:4.0.0-SNAPSHOT'
     implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-security:4.0.0-SNAPSHOT'
     implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-plugin-datamodel:4.0.0-SNAPSHOT'
+
     implementation 'uk.ac.ox.softeng.maurodatamapper.plugins:mdm-plugin-database:2.0.0-SNAPSHOT'
+    implementation 'uk.ac.ox.softeng.maurodatamapper.plugins:mdm-plugin-testing-utils:2.0.0-SNAPSHOT'
 
     implementation group: 'org.postgresql', name: 'postgresql'
 
