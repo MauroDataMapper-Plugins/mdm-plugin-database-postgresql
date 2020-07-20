@@ -1,13 +1,21 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataTypeService
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.PrimitiveType
-import uk.ac.ox.softeng.maurodatamapper.datamodel.provider.DefaultDataTypeProvider
 import uk.ac.ox.softeng.maurodatamapper.datamodel.rest.transport.DefaultDataType
 
-/**
- * @since 19/04/2018
- */
-class PostgresDefaultDatatypeProvider implements DefaultDataTypeProvider {
+class PostgresDefaultDatatypeProvider extends DataTypeService {
+
+    @Override
+    String getDisplayName() {
+        'PostgreSQL 9 DataTypes'
+    }
+
+    @Override
+    String getVersion() {
+        '2.0.0-SNAPSHOT'
+    }
+
     @Override
     List<DefaultDataType> getDefaultListOfDataTypes() {
         [
@@ -57,16 +65,6 @@ class PostgresDefaultDatatypeProvider implements DefaultDataTypeProvider {
             new PrimitiveType(label: 'txid_snapshot', description: 'user-level transaction ID snapshot'),
             new PrimitiveType(label: 'uuid', description: 'universally unique identifier'),
             new PrimitiveType(label: 'xml', description: 'XML data'),
-        ].collect { new DefaultDataType(it) }
-    }
-
-    @Override
-    String getDisplayName() {
-        'PostgreSQL 9 DataTypes'
-    }
-
-    @Override
-    String getVersion() {
-        return ''
+        ].collect { PrimitiveType type -> new DefaultDataType(type) }
     }
 }
