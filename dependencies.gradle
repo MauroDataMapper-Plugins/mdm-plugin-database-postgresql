@@ -1,22 +1,18 @@
 dependencies {
-    implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-core:4.0.0-SNAPSHOT'
-    implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-security:4.0.0-SNAPSHOT'
-    implementation 'uk.ac.ox.softeng.maurodatamapper:mdm-plugin-datamodel:4.0.0-SNAPSHOT'
+    implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-core', version: mdmCoreVersion
+    implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-security', version: mdmSecurityVersion
+    implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-plugin-datamodel', version: mdmPluginDataModelVersion
 
-    implementation 'uk.ac.ox.softeng.maurodatamapper.plugins:mdm-plugin-database:2.0.0-SNAPSHOT'
-    implementation 'uk.ac.ox.softeng.maurodatamapper.plugins:mdm-plugin-testing-utils:2.0.0-SNAPSHOT'
+    implementation group: 'uk.ac.ox.softeng.maurodatamapper.plugins', name: 'mdm-plugin-database', version: mdmPluginDatabaseVersion
+    implementation group: 'uk.ac.ox.softeng.maurodatamapper.plugins', name: 'mdm-plugin-testing-utils', version: mdmPluginTestUtilsVersion
 
-    implementation group: 'org.postgresql', name: 'postgresql'
+    implementation group: 'org.codehaus.groovy', name: 'groovy-all', version: groovyVersion
+    implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
 
-    implementation group: 'org.codehaus.groovy', name: 'groovy'
+    compileOnly group: 'commons-cli', name: 'commons-cli', version: commonsCliVersion
 
-    // Logging
-    api group: 'org.slf4j', name: 'slf4j-api'
-    implementation group: 'ch.qos.logback', name: 'logback-classic'
-
-    /**
-     * Testing
-     */
     testImplementation group: 'junit', name: 'junit', version: junitVersion
-    integrationTestImplementation group: 'org.flywaydb.flyway-test-extensions', name: 'flyway-spring-test', version: project.ext['flyway.version']
+    integrationTestImplementation group: 'org.flywaydb.flyway-test-extensions', name: 'flyway-spring-test', version: flywayVersion
 }
