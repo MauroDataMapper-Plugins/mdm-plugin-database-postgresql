@@ -17,15 +17,6 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         PostgresDatabaseDataModelImporterProviderService> {
 
     @Override
-    PostgresDatabaseDataModelImporterProviderServiceParameters createDatabaseImportParameters() {
-        PostgresDatabaseDataModelImporterProviderServiceParameters params = new PostgresDatabaseDataModelImporterProviderServiceParameters()
-        params.setDatabaseNames 'maurodatamapper_test'
-        params.setDatabaseUsername 'maurodatamapper'
-        params.setDatabasePassword 'MauroDataMapper1234'
-        params
-    }
-
-    @Override
     String getDatabasePortPropertyName() {
         'jdbc.port'
     }
@@ -35,12 +26,19 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         5432
     }
 
+    @Override
+    PostgresDatabaseDataModelImporterProviderServiceParameters createDatabaseImportParameters() {
+        new PostgresDatabaseDataModelImporterProviderServiceParameters().tap {
+            setDatabaseNames 'maurodatamapper_test'
+            setDatabaseUsername 'maurodatamapper'
+            setDatabasePassword 'MauroDataMapper1234'
+        }
+    }
+
     @Test
     void testImportSimpleDatabase() {
-        PostgresDatabaseDataModelImporterProviderServiceParameters params = createDatabaseImportParameters(databaseHost, databasePort)
-        params.setDatabaseNames 'metadata_simple'
-
-        DataModel dataModel = importDataModelAndRetrieveFromDatabase(params)
+        DataModel dataModel = importDataModelAndRetrieveFromDatabase(
+                createDatabaseImportParameters(databaseHost, databasePort).tap { setDatabaseNames 'metadata_simple' })
         assertEquals 'Database/Model name', 'metadata_simple', dataModel.getLabel()
         assertEquals 'Number of columntypes/datatypes', 10, dataModel.getDataTypes()?.size()
         assertEquals 'Number of primitive types', 8, dataModel.getDataTypes().findAll { it.domainType == 'PrimitiveType' }.size()
@@ -48,8 +46,7 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         assertEquals 'Number of tables/dataclasses', 4, dataModel.getDataClasses()?.size()
         assertEquals 'Number of child tables/dataclasses', 1, dataModel.getChildDataClasses()?.size()
 
-        Set<DataClass> childDataClasses = dataModel.getChildDataClasses()
-        DataClass publicSchema = childDataClasses.first()
+        DataClass publicSchema = dataModel.getChildDataClasses().first()
         assertEquals 'Number of child tables/dataclasses', 3, publicSchema.getDataClasses()?.size()
 
         Set<DataClass> dataClasses = publicSchema.dataClasses
