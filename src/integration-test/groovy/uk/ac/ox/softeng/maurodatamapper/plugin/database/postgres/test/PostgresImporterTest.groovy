@@ -9,10 +9,13 @@ import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePlugin
 
 import org.junit.Test
 
+import groovy.transform.CompileStatic
+
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
+@CompileStatic
 class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
         PostgresDatabaseDataModelImporterProviderService> {
 
