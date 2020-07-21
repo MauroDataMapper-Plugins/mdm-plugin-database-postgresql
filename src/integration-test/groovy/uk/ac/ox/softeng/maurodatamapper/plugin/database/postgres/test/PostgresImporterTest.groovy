@@ -19,7 +19,7 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
     @Override
     PostgresDatabaseDataModelImporterProviderServiceParameters createDatabaseImportParameters() {
         PostgresDatabaseDataModelImporterProviderServiceParameters params = new PostgresDatabaseDataModelImporterProviderServiceParameters()
-        params.setDatabaseName 'maurodatamapper_test'
+        params.setDatabaseNames 'maurodatamapper_test'
         params.setDatabaseUsername 'maurodatamapper'
         params.setDatabasePassword 'MauroDataMapper1234'
         params
@@ -38,7 +38,7 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
     @Test
     void testImportSimpleDatabase() {
         PostgresDatabaseDataModelImporterProviderServiceParameters params = createDatabaseImportParameters(databaseHost, databasePort)
-        params.setDatabaseName 'metadata_simple'
+        params.setDatabaseNames 'metadata_simple'
 
         DataModel dataModel = importDataModelAndRetrieveFromDatabase(params)
         assertEquals 'Database/Model name', 'metadata_simple', dataModel.getLabel()
