@@ -1,14 +1,12 @@
 package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.test
 
 import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
-import uk.ac.ox.softeng.maurodatamapper.datamodel.Application
 import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderServiceParameters
 import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePluginTest
 
-import grails.boot.config.GrailsAutoConfiguration
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
@@ -104,10 +102,5 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
         assertEquals("CI optional element description", 0, ciTable.findDataElement('description').minMultiplicity)
         assertEquals("CU mandatory elements", 10, cuTable.dataElements.count {it.minMultiplicity == 1})
 
-    }
-
-    @Override
-    Class<GrailsAutoConfiguration> getTestGrailsApplicationClass() {
-        Application
     }
 }
