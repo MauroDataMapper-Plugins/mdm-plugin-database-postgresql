@@ -45,7 +45,9 @@ jar {
 }
 
 license {
-    header = file "$rootDir/NOTICE"
+    header file('NOTICE')
+    strictCheck true
+    exclude 'dbtest.properties' // See https://github.com/hierynomus/license-gradle-plugin/issues/145
 }
 
 integrationTest {
