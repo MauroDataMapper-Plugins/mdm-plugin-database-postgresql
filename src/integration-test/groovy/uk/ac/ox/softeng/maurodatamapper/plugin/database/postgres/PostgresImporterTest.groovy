@@ -1,10 +1,8 @@
-package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.test
+package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
 
 import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
 import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderService
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres.PostgresDatabaseDataModelImporterProviderServiceParameters
 import uk.ac.ox.softeng.maurodatamapper.plugin.testing.utils.BaseDatabasePluginTest
 
 import org.junit.Test
