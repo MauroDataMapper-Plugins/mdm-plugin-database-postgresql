@@ -1,5 +1,7 @@
 # mdm-plugin-database-postgresql
 
+[![Build Status](https://jenkins.cs.ox.ac.uk/job/Mauro%20Data%20Mapper%20Plugins/job/mdm-plugin-database-postgresql/job/develop/badge/icon)](https://jenkins.cs.ox.ac.uk/job/Mauro%20Data%20Mapper%20Plugins/job/mdm-plugin-database-postgresql/job/develop/)
+
 ## Requirements
 
 * Java 12 (Java.net)
