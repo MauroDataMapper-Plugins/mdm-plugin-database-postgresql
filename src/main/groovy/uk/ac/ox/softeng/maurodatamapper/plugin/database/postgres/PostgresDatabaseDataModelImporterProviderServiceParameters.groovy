@@ -49,23 +49,23 @@ class PostgresDatabaseDataModelImporterProviderServiceParameters extends Databas
     }
 
     @Override
-    PGSimpleDataSource getDataSource(String databaseName) {
+    PGSimpleDataSource getDataSource(String dbName) {
         final PGSimpleDataSource dataSource = new PGSimpleDataSource().tap {
-            setServerNames databaseHost as String[]
-            setPortNumbers databasePort as int[]
-            setDatabaseName databaseName
+            serverNames = databaseHost as String[]
+            portNumbers = databasePort as int[]
+            databaseName = dbName
             if (databaseSSL) {
-                setSsl true
-                setSslMode 'require'
+                ssl = true
+                sslMode = 'require'
             }
         }
-        log.info 'DataSource connection url: {}', dataSource.getUrl()
+        log.info 'DataSource connection url: {}', dataSource.url
         dataSource
     }
 
     @Override
     String getUrl(String databaseName) {
-        getDataSource(databaseName).getUrl()
+        getDataSource(databaseName).url
     }
 
     @Override
