@@ -15,10 +15,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package uk.ac.ox.softeng.maurodatamapper.plugin.database.postgres
+package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.AbstractDatabaseDataModelImporterProviderService
-import uk.ac.ox.softeng.maurodatamapper.plugin.database.RemoteDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
 
 import groovy.transform.CompileStatic
 
@@ -27,8 +27,8 @@ import java.sql.PreparedStatement
 
 @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
-        extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
-        implements RemoteDatabaseDataModelImporterProviderService {
+    extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
+    implements RemoteDatabaseDataModelImporterProviderService {
 
     @Override
     String getDisplayName() {

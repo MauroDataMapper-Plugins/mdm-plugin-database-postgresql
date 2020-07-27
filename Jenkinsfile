@@ -32,26 +32,6 @@ pipeline {
             }
         }
 
-        stage('Unit Test') {
-            steps {
-                sh "./gradlew unitTest"
-            }
-            post {
-                always {
-                    publishHTML([
-                            allowMissing         : true,
-                            alwaysLinkToLastBuild: true,
-                            keepAll              : true,
-                            reportDir            : 'reports/tests/unitTest',
-                            reportFiles          : 'index.html',
-                            reportName           : 'Unit Test Report',
-                            reportTitles         : 'Test'
-                    ])
-                    outputTestResults()
-                }
-            }
-        }
-
         stage('Integration Test') {
             steps {
                 script {
@@ -115,7 +95,7 @@ pipeline {
                             allowMissing         : false,
                             alwaysLinkToLastBuild: false,
                             keepAll              : true,
-                            reportDir            : 'reports/codenarc',
+                            reportDir            : 'build/reports/codenarc',
                             reportFiles          : 'main.html',
                             reportName           : "Codenarc Report"
                         ]
