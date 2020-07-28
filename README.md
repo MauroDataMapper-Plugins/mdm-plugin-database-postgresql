@@ -1,6 +1,9 @@
 # mdm-plugin-database-postgresql
 
-[![Build Status](https://jenkins.cs.ox.ac.uk/job/Mauro%20Data%20Mapper%20Plugins/job/mdm-plugin-database-postgresql/job/develop/badge/icon)](https://jenkins.cs.ox.ac.uk/job/Mauro%20Data%20Mapper%20Plugins/job/mdm-plugin-database-postgresql/job/develop/)
+| Branch | Build Status |
+| ------ | ------------ |
+| master | [![Build Status](https://jenkins.cs.ox.ac.uk/buildStatus/icon?job=Mauro+Data+Mapper+Plugins%2Fmdm-plugin-database-postgresql%2Fmaster)](https://jenkins.cs.ox.ac.uk/blue/organizations/jenkins/Mauro%20Data%20Mapper%20Plugins%2Fmdm-plugin-database-postgresql/branches) |
+| develop | [![Build Status](https://jenkins.cs.ox.ac.uk/buildStatus/icon?job=Mauro+Data+Mapper+Plugins%2Fmdm-plugin-database-postgresql%2Fdevelop)](https://jenkins.cs.ox.ac.uk/blue/organizations/jenkins/Mauro%20Data%20Mapper%20Plugins%2Fmdm-plugin-database-postgresql/branches) |
 
 ## Requirements
 
