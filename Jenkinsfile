@@ -63,7 +63,7 @@ pipeline {
 
         stage('Jacoco Report') {
             steps {
-                sh "./gradlew jacocoRootReport"
+                sh "./gradlew jacocoTestReport"
             }
             post {
                 always {
@@ -72,7 +72,7 @@ pipeline {
                             allowMissing         : true,
                             alwaysLinkToLastBuild: true,
                             keepAll              : true,
-                            reportDir            : 'reports/jacoco/jacocoRootReport/html',
+                            reportDir            : 'reports/jacoco/test/html',
                             reportFiles          : 'index.html',
                             reportName           : 'Coverage Report (Gradle)',
                             reportTitles         : 'Jacoco Coverage'
