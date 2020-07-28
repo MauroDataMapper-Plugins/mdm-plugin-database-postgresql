@@ -30,8 +30,8 @@ import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
 @CompileStatic
-class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
-        PostgresDatabaseDataModelImporterProviderService> {
+class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
+    PostgresDatabaseDataModelImporterProviderService> {
 
     @Override
     String getDatabasePortPropertyName() {
@@ -54,12 +54,16 @@ class PostgresImporterTest extends BaseDatabasePluginTest<PostgresDatabaseDataMo
 
     @Test
     void testImportSimpleDatabase() {
-        DataModel dataModel = importDataModelAndRetrieveFromDatabase(
-                createDatabaseImportParameters(databaseHost, databasePort).tap { setDatabaseNames 'metadata_simple' })
+        PostgresDatabaseDataModelImporterProviderServiceParameters params = createDatabaseImportParameters(databaseHost, databasePort).tap {
+            setDatabaseNames('metadata_simple')
+        }
+
+        DataModel dataModel = importDataModelAndRetrieveFromDatabase(params)
+
         assertEquals 'Database/Model name', 'metadata_simple', dataModel.getLabel()
         assertEquals 'Number of columntypes/datatypes', 10, dataModel.getDataTypes()?.size()
-        assertEquals 'Number of primitive types', 8, dataModel.getDataTypes().findAll { it.domainType == 'PrimitiveType' }.size()
-        assertEquals 'Number of reference types', 2, dataModel.getDataTypes().findAll { it.domainType == 'ReferenceType' }.size()
+        assertEquals 'Number of primitive types', 8, dataModel.getDataTypes().findAll {it.domainType == 'PrimitiveType'}.size()
+        assertEquals 'Number of reference types', 2, dataModel.getDataTypes().findAll {it.domainType == 'ReferenceType'}.size()
         assertEquals 'Number of tables/dataclasses', 4, dataModel.getDataClasses()?.size()
         assertEquals 'Number of child tables/dataclasses', 1, dataModel.getChildDataClasses()?.size()
 
