@@ -30,15 +30,15 @@ import org.postgresql.ds.PGSimpleDataSource
 class PostgresDatabaseDataModelImporterProviderServiceParameters extends DatabaseDataModelImporterProviderServiceParameters<PGSimpleDataSource> {
 
     @ImportParameterConfig(
-            displayName = 'Database Schema(s)',
-            description = [
-                    'A comma-separated list of the schema names to import.',
-                    'If not supplied then all schemas other than "pg_catalog" and "information_schema" will be imported.'],
-            optional = true,
-            group = @ImportGroupConfig(
-                    name = 'Database',
-                    order = 1
-            ))
+        displayName = 'Database Schema(s)',
+        description = [
+            'A comma-separated list of the schema names to import.',
+            'If not supplied then all schemas other than "pg_catalog" and "information_schema" will be imported.'],
+        optional = true,
+        group = @ImportGroupConfig(
+            name = 'Database',
+            order = 1
+        ))
     String schemaNames
 
     @Override
@@ -50,12 +50,13 @@ class PostgresDatabaseDataModelImporterProviderServiceParameters extends Databas
     @Override
     PGSimpleDataSource getDataSource(String dbName) {
         final PGSimpleDataSource dataSource = new PGSimpleDataSource().tap {
-            serverNames = databaseHost as String[]
-            portNumbers = databasePort as int[]
-            databaseName = dbName
+            // Need to use setters here as they handle empty/null elements for us
+            setServerNames getDatabaseServerNames()
+            setPortNumbers getDatabasePortNumbers()
+            setDatabaseName dbName
             if (databaseSSL) {
-                ssl = true
-                sslMode = 'require'
+                setSsl true
+                setSslMode 'require'
             }
         }
         log.info 'DataSource connection url: {}', dataSource.url
@@ -75,5 +76,13 @@ class PostgresDatabaseDataModelImporterProviderServiceParameters extends Databas
     @Override
     int getDefaultPort() {
         5432
+    }
+
+    int[] getDatabasePortNumbers() {
+        [getDatabasePort()].toArray() as int[]
+    }
+
+    String[] getDatabaseServerNames() {
+        [getDatabaseHost()].toArray() as String[]
     }
 }

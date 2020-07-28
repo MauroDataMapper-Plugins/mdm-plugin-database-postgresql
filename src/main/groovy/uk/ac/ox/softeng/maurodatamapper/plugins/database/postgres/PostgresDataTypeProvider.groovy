@@ -84,6 +84,6 @@ class PostgresDataTypeProvider extends DataTypeService {
          [label: 'txid_snapshot', description: 'user-level transaction ID snapshot'],
          [label: 'uuid', description: 'universally unique identifier'],
          [label: 'xml', description: 'XML data'],
-        ].collect { Map<String, String> properties -> new DefaultDataType(new PrimitiveType(properties)) }
+        ].collect {Map<String, String> properties -> new DefaultDataType(new PrimitiveType(properties))}
     }
 }

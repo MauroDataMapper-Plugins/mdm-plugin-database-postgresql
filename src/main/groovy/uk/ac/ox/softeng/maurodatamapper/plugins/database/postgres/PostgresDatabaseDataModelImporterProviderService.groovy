@@ -124,8 +124,8 @@ class PostgresDatabaseDataModelImporterProviderService
         if (!parameters.schemaNames) return super.prepareCoreStatement(connection, parameters)
         final List<String> names = parameters.schemaNames.split(',') as List<String>
         final PreparedStatement statement = connection.prepareStatement(
-                """SELECT * FROM information_schema.columns WHERE table_schema IN (${names.collect { '?' }.join(',')});""")
-        names.eachWithIndex { String name, int i -> statement.setString(i + 1, name) }
+            """SELECT * FROM information_schema.columns WHERE table_schema IN (${names.collect {'?'}.join(',')});""")
+        names.eachWithIndex {String name, int i -> statement.setString(i + 1, name)}
         statement
     }
 }
