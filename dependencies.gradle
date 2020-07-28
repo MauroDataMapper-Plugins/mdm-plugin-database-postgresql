@@ -1,6 +1,5 @@
 dependencies {
     implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-core', version: mdmCoreVersion
-    implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-security', version: mdmSecurityVersion
     implementation group: 'uk.ac.ox.softeng.maurodatamapper', name: 'mdm-plugin-datamodel', version: mdmPluginDataModelVersion
 
     implementation group: 'uk.ac.ox.softeng.maurodatamapper.plugins', name: 'mdm-plugin-database', version: mdmPluginDatabaseVersion
@@ -10,9 +9,4 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-
-    compileOnly group: 'commons-cli', name: 'commons-cli', version: commonsCliVersion
-
-    testImplementation group: 'junit', name: 'junit', version: junitVersion
-    integrationTestImplementation group: 'org.flywaydb.flyway-test-extensions', name: 'flyway-spring-test', version: flywayVersion
 }
