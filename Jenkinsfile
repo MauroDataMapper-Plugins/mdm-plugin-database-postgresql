@@ -47,10 +47,10 @@ pipeline {
             post {
                 always {
                     publishHTML([
-                            allowMissing         : true,
+                            allowMissing         : false,
                             alwaysLinkToLastBuild: true,
                             keepAll              : true,
-                            reportDir            : 'reports/tests/integrationTest',
+                            reportDir            : 'build/reports/tests/integrationTest',
                             reportFiles          : 'index.html',
                             reportName           : 'Integration Test Report',
                             reportTitles         : 'Test'
@@ -69,10 +69,10 @@ pipeline {
                 always {
                     jacoco execPattern: '**/build/jacoco/*.exec'
                     publishHTML([
-                            allowMissing         : true,
+                            allowMissing         : false,
                             alwaysLinkToLastBuild: true,
                             keepAll              : true,
-                            reportDir            : 'reports/jacoco/test/html',
+                            reportDir            : 'build/reports/jacoco/test/html',
                             reportFiles          : 'index.html',
                             reportName           : 'Coverage Report (Gradle)',
                             reportTitles         : 'Jacoco Coverage'
