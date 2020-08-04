@@ -20,12 +20,10 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
 
-import groovy.transform.CompileStatic
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 
-@CompileStatic
+// @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
     extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
     implements RemoteDatabaseDataModelImporterProviderService {

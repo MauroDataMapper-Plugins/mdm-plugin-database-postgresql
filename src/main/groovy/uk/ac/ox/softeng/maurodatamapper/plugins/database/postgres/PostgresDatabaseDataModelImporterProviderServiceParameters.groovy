@@ -21,12 +21,11 @@ import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.
 import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportParameterConfig
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.DatabaseDataModelImporterProviderServiceParameters
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.postgresql.ds.PGSimpleDataSource
 
-@CompileStatic
 @Slf4j
+// @CompileStatic
 class PostgresDatabaseDataModelImporterProviderServiceParameters extends DatabaseDataModelImporterProviderServiceParameters<PGSimpleDataSource> {
 
     @ImportParameterConfig(
