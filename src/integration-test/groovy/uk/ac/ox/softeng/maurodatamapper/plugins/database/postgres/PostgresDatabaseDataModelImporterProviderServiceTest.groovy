@@ -22,14 +22,13 @@ import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePluginTest
 
-import groovy.transform.CompileStatic
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 
-@CompileStatic
+// @CompileStatic
 class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
     PostgresDatabaseDataModelImporterProviderService> {
 

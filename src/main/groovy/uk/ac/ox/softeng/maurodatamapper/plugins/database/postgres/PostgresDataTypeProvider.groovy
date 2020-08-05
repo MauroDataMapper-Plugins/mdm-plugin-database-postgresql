@@ -21,9 +21,7 @@ import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataTypeService
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.PrimitiveType
 import uk.ac.ox.softeng.maurodatamapper.datamodel.rest.transport.DefaultDataType
 
-import groovy.transform.CompileStatic
-
-@CompileStatic
+// @CompileStatic
 class PostgresDataTypeProvider extends DataTypeService {
 
     @Override
