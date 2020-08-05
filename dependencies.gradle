@@ -9,4 +9,6 @@ dependencies {
     implementation group: 'org.postgresql', name: 'postgresql', version: postgresJdbcVersion
     implementation group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+
+    testImplementation group: 'uk.ac.ox.softeng.maurodatamapper.plugins', name: 'mdm-plugin-testing-utils', version: mdmPluginTestUtilsVersion
 }
