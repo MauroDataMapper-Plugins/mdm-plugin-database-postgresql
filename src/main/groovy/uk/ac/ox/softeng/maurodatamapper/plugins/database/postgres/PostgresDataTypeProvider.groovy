@@ -30,11 +30,6 @@ class PostgresDataTypeProvider extends DataTypeService {
     }
 
     @Override
-    String getVersion() {
-        '2.1.0-SNAPSHOT'
-    }
-
-    @Override
     List<DefaultDataType> getDefaultListOfDataTypes() {
         [[label: 'bigint', description: 'signed eight-byte integer'],
          [label: 'bigserial', description: 'autoincrementing eight-byte integer'],

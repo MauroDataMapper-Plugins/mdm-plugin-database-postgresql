@@ -21,8 +21,9 @@ import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.
 import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportParameterConfig
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.DatabaseDataModelImporterProviderServiceParameters
 
-import groovy.util.logging.Slf4j
 import org.postgresql.ds.PGSimpleDataSource
+
+import groovy.util.logging.Slf4j
 
 @Slf4j
 // @CompileStatic
@@ -77,11 +78,11 @@ class PostgresDatabaseDataModelImporterProviderServiceParameters extends Databas
         5432
     }
 
-    int[] getDatabasePortNumbers() {
-        [getDatabasePort()].toArray() as int[]
+    String[] getDatabaseServerNames() {
+        [databaseHost].toArray() as String[]
     }
 
-    String[] getDatabaseServerNames() {
-        [getDatabaseHost()].toArray() as String[]
+    int[] getDatabasePortNumbers() {
+        [databasePort].toArray() as int[]
     }
 }
