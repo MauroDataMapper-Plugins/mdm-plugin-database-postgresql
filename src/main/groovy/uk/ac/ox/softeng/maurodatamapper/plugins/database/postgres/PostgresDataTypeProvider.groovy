@@ -17,16 +17,24 @@
  */
 package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
-import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataTypeService
+
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.PrimitiveType
+import uk.ac.ox.softeng.maurodatamapper.datamodel.provider.DefaultDataTypeProvider
 import uk.ac.ox.softeng.maurodatamapper.datamodel.rest.transport.DefaultDataType
 
-// @CompileStatic
-class PostgresDataTypeProvider extends DataTypeService {
+import groovy.transform.CompileStatic
+
+@CompileStatic
+class PostgresDataTypeProvider implements DefaultDataTypeProvider {
 
     @Override
     String getDisplayName() {
         'PostgreSQL 9 DataTypes'
+    }
+
+    @Override
+    String getVersion() {
+        '2.0.0-SNAPSHOT'
     }
 
     @Override
