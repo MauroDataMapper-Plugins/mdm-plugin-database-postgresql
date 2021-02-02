@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 University of Oxford
+ * Copyright 2020 University of Oxford and Health and Social Care Information Centre, also known as NHS Digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@ import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.
 import uk.ac.ox.softeng.maurodatamapper.core.provider.importer.parameter.config.ImportParameterConfig
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.DatabaseDataModelImporterProviderServiceParameters
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import org.postgresql.ds.PGSimpleDataSource
 
-@CompileStatic
 @Slf4j
+// @CompileStatic
 class PostgresDatabaseDataModelImporterProviderServiceParameters extends DatabaseDataModelImporterProviderServiceParameters<PGSimpleDataSource> {
 
     @ImportParameterConfig(
@@ -78,11 +77,11 @@ class PostgresDatabaseDataModelImporterProviderServiceParameters extends Databas
         5432
     }
 
-    int[] getDatabasePortNumbers() {
-        [getDatabasePort()].toArray() as int[]
+    String[] getDatabaseServerNames() {
+        [databaseHost].toArray() as String[]
     }
 
-    String[] getDatabaseServerNames() {
-        [getDatabaseHost()].toArray() as String[]
+    int[] getDatabasePortNumbers() {
+        [databasePort].toArray() as int[]
     }
 }

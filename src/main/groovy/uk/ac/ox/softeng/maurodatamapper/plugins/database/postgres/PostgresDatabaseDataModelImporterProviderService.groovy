@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 University of Oxford
+ * Copyright 2020 University of Oxford and Health and Social Care Information Centre, also known as NHS Digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,10 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
 
-import groovy.transform.CompileStatic
-
 import java.sql.Connection
 import java.sql.PreparedStatement
 
-@CompileStatic
+// @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
     extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
     implements RemoteDatabaseDataModelImporterProviderService {
@@ -37,7 +35,7 @@ class PostgresDatabaseDataModelImporterProviderService
 
     @Override
     String getVersion() {
-        '2.0.0-SNAPSHOT'
+        '2.1.0-SNAPSHOT'
     }
 
     @Override
