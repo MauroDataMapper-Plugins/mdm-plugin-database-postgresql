@@ -34,7 +34,7 @@ class PostgresDataTypeProvider implements DefaultDataTypeProvider {
 
     @Override
     String getVersion() {
-        '2.0.0-SNAPSHOT'
+        getClass().getPackage().getSpecificationVersion() ?: 'SNAPSHOT'
     }
 
     @Override
