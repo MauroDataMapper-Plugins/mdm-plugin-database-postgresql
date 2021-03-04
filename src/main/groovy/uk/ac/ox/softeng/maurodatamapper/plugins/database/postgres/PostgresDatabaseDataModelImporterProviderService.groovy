@@ -35,7 +35,7 @@ class PostgresDatabaseDataModelImporterProviderService
 
     @Override
     String getVersion() {
-        '2.1.0-SNAPSHOT'
+        getClass().getPackage().getSpecificationVersion() ?: 'SNAPSHOT'
     }
 
     @Override
