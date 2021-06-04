@@ -70,13 +70,13 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         // Tables
         final DataClass metadataTable = dataClasses.find {it.label == 'metadata'}
         assertEquals 'Metadata Number of columns/dataElements', 10, metadataTable.dataElements.size()
-        assertEquals 'Metadata Number of metadata', 5, metadataTable.metadata.size()
+        assertEquals 'Metadata Number of metadata', 8, metadataTable.metadata.size()
 
         assertTrue 'MD All metadata values are valid', metadataTable.metadata.every {it.value && it.key != it.value}
 
-        assertEquals 'MD Primary key', 1, metadataTable.metadata.count {it.key.startsWith 'primary_key'}
-        assertEquals 'MD Primary indexes', 1, metadataTable.metadata.count {it.key.startsWith 'primary_index'}
-        assertEquals 'MD Unique indexes', 1, metadataTable.metadata.count {it.key.startsWith 'unique_index'}
+        assertEquals 'MD Primary key', 2, metadataTable.metadata.count {it.key.startsWith 'primary_key'}
+        assertEquals 'MD Primary indexes', 2, metadataTable.metadata.count {it.key.startsWith 'primary_index'}
+        assertEquals 'MD Unique indexes', 2, metadataTable.metadata.count {it.key.startsWith 'unique_index'}
         assertEquals 'MD Indexes', 2, metadataTable.metadata.count {it.key.startsWith 'index'}
 
         final Metadata multipleColIndex = metadataTable.metadata.find {it.key.contains 'unique_item_id_namespace_key'}
