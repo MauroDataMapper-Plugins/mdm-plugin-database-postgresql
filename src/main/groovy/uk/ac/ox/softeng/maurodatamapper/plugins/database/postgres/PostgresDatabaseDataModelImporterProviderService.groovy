@@ -17,6 +17,7 @@
  */
 package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
 
@@ -115,6 +116,23 @@ class PostgresDatabaseDataModelImporterProviderService
         FROM information_schema.columns
         WHERE table_schema NOT IN ('pg_catalog','information_schema');
         '''.stripIndent()
+    }
+
+    //PostgreSQL quote escaping of identifiers
+    @Override
+    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
+        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
+    }
+
+    //PostgreSQL quote escaping of identifiers
+    @Override
+    String distinctColumnValuesQueryString(String tableName, String columnName) {
+        "SELECT DISTINCT(\"${columnName}\") AS distinct_value FROM \"${tableName}\";"
+    }
+
+    @Override
+    boolean isColumnPossibleEnumeration(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
     }
 
     @Override
