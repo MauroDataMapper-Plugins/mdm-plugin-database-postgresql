@@ -137,3 +137,33 @@ INSERT INTO organisation(id, org_name, org_type, org_code, description, org_char
 (38, 'ORG38', 'TYPEB', 'CODEX', 'Description of ORG38', 'CHAR3'),
 (39, 'ORG39', 'TYPEB', 'CODEX', 'Description of ORG39', 'CHAR3'),
 (40, 'ORG40', 'TYPEB', 'CODER', 'Description of ORG40', 'CHAR3');
+
+CREATE TABLE sample
+(
+  id SERIAL PRIMARY KEY,
+  sample_smallint SMALLINT,
+  sample_int INTEGER,
+  sample_bigint BIGINT,
+  sample_decimal DECIMAL(12,3),
+  sample_numeric NUMERIC(10,6),
+  sample_date DATE,
+  sample_timestamp_without_tz TIMESTAMP,
+  sample_timestamp_with_tz TIMESTAMP WITH TIME ZONE
+);
+
+--sample data: sample_smallint goes from -100 to 100. sample_int goes from 0 to 10000.
+--sample_bigint goes from -1000000 to 1000000
+WITH RECURSIVE populate AS (
+SELECT -100 AS x UNION ALL SELECT x + 1 FROM populate WHERE x < 100
+)
+INSERT INTO sample (sample_smallint, sample_int, sample_bigint, sample_decimal, sample_numeric, sample_date, sample_timestamp_without_tz, sample_timestamp_with_tz)
+SELECT
+x, --smallint
+x*x, --integer
+x*x*x, --bigint
+x*x * 573, --decimal
+x*x*x / 104756.576, --numeric
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 day', --date
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour', --timestamp
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour' --timestamp with timezone
+FROM populate;

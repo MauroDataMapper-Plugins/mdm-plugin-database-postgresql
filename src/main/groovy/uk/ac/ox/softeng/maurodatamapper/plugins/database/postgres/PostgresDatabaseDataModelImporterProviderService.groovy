@@ -20,9 +20,11 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.summarymetadata.AbstractIntervalHelper
 
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.time.format.DateTimeFormatter
 
 // @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
@@ -133,6 +135,87 @@ class PostgresDatabaseDataModelImporterProviderService
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
         dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
+    }
+
+    @Override
+    boolean isColumnForDateSummary(DataType dataType) {
+        ["date", "timestamp without time zone", "timestamp with time zone"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForDecimalSummary(DataType dataType) {
+        ["decimal", "numeric"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForIntegerSummary(DataType dataType) {
+        ["smallint", "integer", "bigint"].contains(dataType.label)
+    }
+
+    @Override
+    String minMaxColumnValuesQueryString(String tableName, String columnName) {
+        "SELECT MIN(\"${columnName}\") AS min_value, MAX(\"${columnName}\") AS max_value FROM \"${tableName}\";"
+    }
+
+    @Override
+    String columnRangeDistributionQueryString(String tableName, String columnName, DataType dataType, AbstractIntervalHelper intervalHelper) {
+        List<String> selects = intervalHelper.intervals.collect {
+            "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
+        }
+
+        rangeDistributionQueryString(tableName, columnName, selects)
+    }
+
+    /**
+     * Return a string which uses the SQL Server CONVERT function for Dates, otherwise string formatting
+     *
+     * @param dataType
+     * @param value
+     * @return Date formatted as ISO8601 (see
+     * https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-ver15)
+     * or a string
+     */
+    String formatDataType(DataType dataType, Object value) {
+        if (isColumnForDateSummary(dataType)){
+            "TO_TIMESTAMP('${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(value)}', 'YYYY-MM-DDTHH:MI:SS')"
+        } else {
+            "${value}"
+        }
+    }
+
+    /**
+     * Returns a String that looks, for example, like this:
+     * WITH #interval AS (
+     *   SELECT '0 - 100' AS interval_label, 0 AS interval_start, 100 AS interval_end
+     *   UNION
+     *   SELECT '100 - 200' AS interval_label, 100 AS interval_start, 200 AS interval_end
+     * )
+     * SELECT interval_label, COUNT("my_column") AS interval_count
+     * FROM #interval
+     * LEFT JOIN
+     * "my_table" ON "my_table"."my_column" >= #interval.interval_start AND "my_table"."my_column" < #interval.interval_end
+     * GROUP BY interval_label, interval_start
+     * ORDER BY interval_start ASC;
+     *
+     * @param tableName
+     * @param columnName
+     * @param selects
+     * @return
+     */
+    private String rangeDistributionQueryString(String tableName, String columnName, List<String> selects) {
+        String intervals = selects.join(" UNION ")
+
+        String sql = "WITH interval AS (${intervals})" +
+                """
+        SELECT interval_label, COUNT(\"${columnName}\") AS interval_count
+        FROM interval
+        LEFT JOIN
+        \"${tableName}\" ON \"${tableName}\".\"${columnName}\" >= interval.interval_start AND \"${tableName}\".\"${columnName}\" < interval.interval_end
+        GROUP BY interval_label, interval_start
+        ORDER BY interval_start ASC;
+        """
+
+        sql.stripIndent()
     }
 
     @Override
