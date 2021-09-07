@@ -120,17 +120,25 @@ class PostgresDatabaseDataModelImporterProviderService
         '''.stripIndent()
     }
 
-    //PostgreSQL quote escaping of identifiers
+    /**
+     * PostgreSQL identifiers escaped in double quotes.
+     */
     @Override
-    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
+    String escapeIdentifier(String identifier) {
+        "\"${identifier}\""
     }
 
     //PostgreSQL quote escaping of identifiers
-    @Override
+    /*@Override
+    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
+        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
+    }*/
+
+    //PostgreSQL quote escaping of identifiers
+    /*@Override
     String distinctColumnValuesQueryString(String tableName, String columnName) {
         "SELECT DISTINCT(\"${columnName}\") AS distinct_value FROM \"${tableName}\";"
-    }
+    }*/
 
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
@@ -139,41 +147,34 @@ class PostgresDatabaseDataModelImporterProviderService
 
     @Override
     boolean isColumnForDateSummary(DataType dataType) {
-        ["date", "timestamp without time zone", "timestamp with time zone"].contains(dataType.label)
+        dataType.domainType == 'PrimitiveType' && ["date", "timestamp without time zone", "timestamp with time zone"].contains(dataType.label)
     }
 
     @Override
     boolean isColumnForDecimalSummary(DataType dataType) {
-        ["decimal", "numeric"].contains(dataType.label)
+        dataType.domainType == 'PrimitiveType' && ["decimal", "numeric"].contains(dataType.label)
     }
 
     @Override
     boolean isColumnForIntegerSummary(DataType dataType) {
-        ["smallint", "integer", "bigint"].contains(dataType.label)
+        dataType.domainType == 'PrimitiveType' && ["smallint", "integer", "bigint"].contains(dataType.label)
     }
 
     @Override
-    String minMaxColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT MIN(\"${columnName}\") AS min_value, MAX(\"${columnName}\") AS max_value FROM \"${tableName}\";"
-    }
-
-    @Override
-    String columnRangeDistributionQueryString(String tableName, String columnName, DataType dataType, AbstractIntervalHelper intervalHelper) {
+    String columnRangeDistributionQueryString(String schemaName, String tableName, String columnName, DataType dataType, AbstractIntervalHelper intervalHelper) {
         List<String> selects = intervalHelper.intervals.collect {
             "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
         }
 
-        rangeDistributionQueryString(tableName, columnName, selects)
+        rangeDistributionQueryString(schemaName, tableName, columnName, selects)
     }
 
     /**
-     * Return a string which uses the SQL Server CONVERT function for Dates, otherwise string formatting
+     * Return a string which uses the PostgreSQL TO_TIMESTAMP function for Dates, otherwise string formatting
      *
      * @param dataType
      * @param value
-     * @return Date formatted as ISO8601 (see
-     * https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-ver15)
-     * or a string
+     * @return Fragment of query string, either TO_TIMESTAMP or value
      */
     String formatDataType(DataType dataType, Object value) {
         if (isColumnForDateSummary(dataType)){
@@ -185,32 +186,35 @@ class PostgresDatabaseDataModelImporterProviderService
 
     /**
      * Returns a String that looks, for example, like this:
-     * WITH #interval AS (
+     * WITH interval AS (
      *   SELECT '0 - 100' AS interval_label, 0 AS interval_start, 100 AS interval_end
      *   UNION
      *   SELECT '100 - 200' AS interval_label, 100 AS interval_start, 200 AS interval_end
      * )
      * SELECT interval_label, COUNT("my_column") AS interval_count
-     * FROM #interval
+     * FROM interval
      * LEFT JOIN
-     * "my_table" ON "my_table"."my_column" >= #interval.interval_start AND "my_table"."my_column" < #interval.interval_end
+     * "my_schema"."my_table" ON "my_schema"."my_table"."my_column" >= #interval.interval_start AND "my_schema"."my_table"."my_column" < #interval.interval_end
      * GROUP BY interval_label, interval_start
      * ORDER BY interval_start ASC;
      *
+     * @param schemaName
      * @param tableName
      * @param columnName
      * @param selects
      * @return
      */
-    private String rangeDistributionQueryString(String tableName, String columnName, List<String> selects) {
+    private String rangeDistributionQueryString(String schemaName, String tableName, String columnName, List<String> selects) {
         String intervals = selects.join(" UNION ")
 
         String sql = "WITH interval AS (${intervals})" +
                 """
-        SELECT interval_label, COUNT(\"${columnName}\") AS interval_count
+        SELECT interval_label, COUNT(${escapeIdentifier(columnName)}) AS interval_count
         FROM interval
         LEFT JOIN
-        \"${tableName}\" ON \"${tableName}\".\"${columnName}\" >= interval.interval_start AND \"${tableName}\".\"${columnName}\" < interval.interval_end
+        ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)} 
+        ON ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)}  >= interval.interval_start 
+        AND ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)} < interval.interval_end
         GROUP BY interval_label, interval_start
         ORDER BY interval_start ASC;
         """
