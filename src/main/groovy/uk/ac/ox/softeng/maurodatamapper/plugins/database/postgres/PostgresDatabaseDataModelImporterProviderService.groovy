@@ -128,18 +128,6 @@ class PostgresDatabaseDataModelImporterProviderService
         "\"${identifier}\""
     }
 
-    //PostgreSQL quote escaping of identifiers
-    /*@Override
-    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
-    }*/
-
-    //PostgreSQL quote escaping of identifiers
-    /*@Override
-    String distinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT DISTINCT(\"${columnName}\") AS distinct_value FROM \"${tableName}\";"
-    }*/
-
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
         dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
@@ -161,12 +149,12 @@ class PostgresDatabaseDataModelImporterProviderService
     }
 
     @Override
-    String columnRangeDistributionQueryString(String schemaName, String tableName, String columnName, DataType dataType, AbstractIntervalHelper intervalHelper) {
+    String columnRangeDistributionQueryString(DataType dataType, AbstractIntervalHelper intervalHelper, String columnName, String tableName, String schemaName) {
         List<String> selects = intervalHelper.intervals.collect {
             "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
         }
 
-        rangeDistributionQueryString(schemaName, tableName, columnName, selects)
+        rangeDistributionQueryString(selects, columnName, tableName, schemaName)
     }
 
     /**
@@ -204,7 +192,7 @@ class PostgresDatabaseDataModelImporterProviderService
      * @param selects
      * @return
      */
-    private String rangeDistributionQueryString(String schemaName, String tableName, String columnName, List<String> selects) {
+    private String rangeDistributionQueryString(List<String> selects, String columnName, String tableName, String schemaName) {
         String intervals = selects.join(" UNION ")
 
         String sql = "WITH interval AS (${intervals})" +
