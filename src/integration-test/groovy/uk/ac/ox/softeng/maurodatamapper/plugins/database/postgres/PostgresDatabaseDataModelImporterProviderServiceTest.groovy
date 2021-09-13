@@ -20,6 +20,7 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
 import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataElement
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.EnumerationType
 import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePluginTest
 
@@ -59,16 +60,16 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
             createDatabaseImportParameters(databaseHost, databasePort).tap {databaseNames = 'metadata_simple'})
         assertEquals 'Database/Model name', 'metadata_simple', dataModel.label
-        assertEquals 'Number of columntypes/datatypes', 11, dataModel.dataTypes?.size()
-        assertEquals 'Number of primitive types', 9, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
+        assertEquals 'Number of columntypes/datatypes', 15, dataModel.dataTypes?.size()
+        assertEquals 'Number of primitive types', 13, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
         assertEquals 'Number of reference types', 2, dataModel.dataTypes.findAll {it.domainType == 'ReferenceType'}.size()
         assertEquals 'Number of enumeration types', 0, dataModel.dataTypes.findAll {it.domainType == 'EnumerationType'}.size()
         assertEquals 'Number of char datatypes', 1, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType' && it.label == 'character'}.size()
-        assertEquals 'Number of tables/dataclasses', 5, dataModel.dataClasses?.size()
+        assertEquals 'Number of tables/dataclasses', 6, dataModel.dataClasses?.size()
         assertEquals 'Number of child tables/dataclasses', 1, dataModel.childDataClasses?.size()
 
         final DataClass publicSchema = dataModel.childDataClasses.first()
-        assertEquals 'Number of child tables/dataclasses', 4, publicSchema.dataClasses?.size()
+        assertEquals 'Number of child tables/dataclasses', 5, publicSchema.dataClasses?.size()
 
         final Set<DataClass> dataClasses = publicSchema.dataClasses
 
@@ -153,16 +154,16 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
                     detectEnumerations = true;
                     maxEnumerations = 20})
         assertEquals 'Database/Model name', 'metadata_simple', dataModel.label
-        assertEquals 'Number of columntypes/datatypes', 13, dataModel.dataTypes?.size()
-        assertEquals 'Number of primitive types', 8, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
+        assertEquals 'Number of columntypes/datatypes', 17, dataModel.dataTypes?.size()
+        assertEquals 'Number of primitive types', 12, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
         assertEquals 'Number of reference types', 2, dataModel.dataTypes.findAll {it.domainType == 'ReferenceType'}.size()
         assertEquals 'Number of enumeration types', 3, dataModel.dataTypes.findAll {it.domainType == 'EnumerationType'}.size()
         assertEquals 'Number of char datatypes', 0, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType' && it.label == 'character'}.size()
-        assertEquals 'Number of tables/dataclasses', 5, dataModel.dataClasses?.size()
+        assertEquals 'Number of tables/dataclasses', 6, dataModel.dataClasses?.size()
         assertEquals 'Number of child tables/dataclasses', 1, dataModel.childDataClasses?.size()
 
         final DataClass publicSchema = dataModel.childDataClasses.first()
-        assertEquals 'Number of child tables/dataclasses', 4, publicSchema.dataClasses?.size()
+        assertEquals 'Number of child tables/dataclasses', 5, publicSchema.dataClasses?.size()
 
         final Set<DataClass> dataClasses = publicSchema.dataClasses
 
@@ -259,5 +260,72 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         assertNotNull 'Enumeration value found', orgCharEnumerationType.enumerationValues.find{it.key == 'CHAR2'}
         assertNotNull 'Enumeration value found', orgCharEnumerationType.enumerationValues.find{it.key == 'CHAR3'}
         assertNull 'Not an expected value', orgCharEnumerationType.enumerationValues.find{it.key == 'CHAR4'}
+    }
+
+    @Test
+    void 'testImportSimpleDatabaseWithSummaryMetadata'() {
+        final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
+                createDatabaseImportParameters(databaseHost, databasePort).tap {
+                    databaseNames = 'metadata_simple';
+                    detectEnumerations = true;
+                    maxEnumerations = 20;
+                    calculateSummaryMetadata = true;
+                })
+
+        final DataClass publicSchema = dataModel.childDataClasses.first()
+        assertEquals 'Number of child tables/dataclasses', 5, publicSchema.dataClasses?.size()
+
+        final Set<DataClass> dataClasses = publicSchema.dataClasses
+        final DataClass sampleTable = dataClasses.find {it.label == 'sample'}
+
+        assertEquals 'Sample Number of columns/dataElements', 9, sampleTable.dataElements.size()
+
+        //sample_smallint
+        final DataElement sample_smallint = sampleTable.dataElements.find{it.label == "sample_smallint"}
+        assertEquals 'reportValue for sample_smallint',
+                '{"-100 - -80":20,"-80 - -60":20,"-60 - -40":20,"-40 - -20":20,"-20 - 0":20,"0 - 20":20,"20 - 40":20,"40 - 60":20,"60 - 80":20,"80 - 100":20,"100 - 120":1}',
+                sample_smallint.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_bigint
+        final DataElement sample_bigint = sampleTable.dataElements.find{it.label == "sample_bigint"}
+        assertEquals 'reportValue for sample_bigint',
+                '{"-1000000 - -800000":8,"-800000 - -600000":8,"-600000 - -400000":11,"-400000 - -200000":15,"-200000 - 0":58,"0 - 200000":59,"200000 - 400000":15,"400000 - 600000":11,"600000 - 800000":8,"800000 - 1000000":7,"1000000 - 1200000":1}',
+                sample_bigint.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_int
+        final DataElement sample_int = sampleTable.dataElements.find{it.label == "sample_int"}
+        assertEquals 'reportValue for sample_int',
+                '{"0 - 1000":63,"1000 - 2000":26,"2000 - 3000":20,"3000 - 4000":18,"4000 - 5000":14,"5000 - 6000":14,"6000 - 7000":12,"7000 - 8000":12,"8000 - 9000":10,"9000 - 10000":10,"10000 - 11000":2}',
+                sample_int.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_decimal
+        final DataElement sample_decimal = sampleTable.dataElements.find{it.label == "sample_decimal"}
+        assertEquals 'reportValue for sample_decimal',
+                '{"0.000 - 1000000.000":83,"1000000.000 - 2000000.000":36,"2000000.000 - 3000000.000":26,"3000000.000 - 4000000.000":22,"4000000.000 - 5000000.000":20,"5000000.000 - 6000000.000":14}',
+                sample_decimal.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_numeric
+        final DataElement sample_numeric = sampleTable.dataElements.find{it.label == "sample_numeric"}
+        assertEquals 'reportValue for sample_numeric',
+                '{"-5.000000 - 0.000000":80,"0.000000 - 5.000000":81,"5.000000 - 10.000000":20}',
+                sample_numeric.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_date
+        final DataElement sample_date = sampleTable.dataElements.find{it.label == "sample_date"}
+        assertEquals 'reportValue for sample_date',
+                '{"May 2020":8,"Jun 2020":30,"Jul 2020":31,"Aug 2020":31,"Sep 2020":30,"Oct 2020":31,"Nov 2020":30,"Dec 2020":10}',
+                sample_date.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_timestamp_without_tz
+        final DataElement sample_timestamp_without_tz = sampleTable.dataElements.find{it.label == "sample_timestamp_without_tz"}
+        assertEquals 'reportValue for sample_timestamp_without_tz',
+                '{"27/08/2020 - 28/08/2020":4,"28/08/2020 - 29/08/2020":24,"29/08/2020 - 30/08/2020":24,"30/08/2020 - 31/08/2020":24,"31/08/2020 - 01/09/2020":24,"01/09/2020 - 02/09/2020":24,"02/09/2020 - 03/09/2020":24,"03/09/2020 - 04/09/2020":24,"04/09/2020 - 05/09/2020":24,"05/09/2020 - 06/09/2020":5}',
+                sample_timestamp_without_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue
+
+        //sample_timestamp_with_tz
+        //Timestamp wth timezone will give different results depending on the client timezone, so use a less strict test
+        final DataElement sample_timestamp_with_tz = sampleTable.dataElements.find{it.label == "sample_timestamp_with_tz"}
+        assertTrue 'reportValue for sample_timestamp_with_tz contains expected string',
+                sample_timestamp_with_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue.contains('"28/08/2020 - 29/08/2020":24,"29/08/2020 - 30/08/2020":24,"30/08/2020 - 31/08/2020":24,"31/08/2020 - 01/09/2020":24,"01/09/2020 - 02/09/2020":24,"02/09/2020 - 03/09/2020":24,"03/09/2020 - 04/09/2020":24,"04/09/2020 - 05/09/2020":24')
     }
 }

@@ -20,9 +20,11 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.summarymetadata.AbstractIntervalHelper
 
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.time.format.DateTimeFormatter
 
 // @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
@@ -118,21 +120,94 @@ class PostgresDatabaseDataModelImporterProviderService
         '''.stripIndent()
     }
 
-    //PostgreSQL quote escaping of identifiers
+    /**
+     * PostgreSQL identifiers escaped in double quotes.
+     */
     @Override
-    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
-    }
-
-    //PostgreSQL quote escaping of identifiers
-    @Override
-    String distinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT DISTINCT(\"${columnName}\") AS distinct_value FROM \"${tableName}\";"
+    String escapeIdentifier(String identifier) {
+        "\"${identifier}\""
     }
 
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
         dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
+    }
+
+    @Override
+    boolean isColumnForDateSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["date", "timestamp without time zone", "timestamp with time zone"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForDecimalSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["decimal", "numeric"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForIntegerSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["smallint", "integer", "bigint"].contains(dataType.label)
+    }
+
+    @Override
+    String columnRangeDistributionQueryString(DataType dataType, AbstractIntervalHelper intervalHelper, String columnName, String tableName, String schemaName) {
+        List<String> selects = intervalHelper.intervals.collect {
+            "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
+        }
+
+        rangeDistributionQueryString(selects, columnName, tableName, schemaName)
+    }
+
+    /**
+     * Return a string which uses the PostgreSQL TO_TIMESTAMP function for Dates, otherwise string formatting
+     *
+     * @param dataType
+     * @param value
+     * @return Fragment of query string, either TO_TIMESTAMP or value
+     */
+    String formatDataType(DataType dataType, Object value) {
+        if (isColumnForDateSummary(dataType)){
+            "TO_TIMESTAMP('${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(value)}', 'YYYY-MM-DDTHH:MI:SS')"
+        } else {
+            "${value}"
+        }
+    }
+
+    /**
+     * Returns a String that looks, for example, like this:
+     * WITH interval AS (
+     *   SELECT '0 - 100' AS interval_label, 0 AS interval_start, 100 AS interval_end
+     *   UNION
+     *   SELECT '100 - 200' AS interval_label, 100 AS interval_start, 200 AS interval_end
+     * )
+     * SELECT interval_label, COUNT("my_column") AS interval_count
+     * FROM interval
+     * LEFT JOIN
+     * "my_schema"."my_table" ON "my_schema"."my_table"."my_column" >= #interval.interval_start AND "my_schema"."my_table"."my_column" < #interval.interval_end
+     * GROUP BY interval_label, interval_start
+     * ORDER BY interval_start ASC;
+     *
+     * @param schemaName
+     * @param tableName
+     * @param columnName
+     * @param selects
+     * @return
+     */
+    private String rangeDistributionQueryString(List<String> selects, String columnName, String tableName, String schemaName) {
+        String intervals = selects.join(" UNION ")
+
+        String sql = "WITH interval AS (${intervals})" +
+                """
+        SELECT interval_label, COUNT(${escapeIdentifier(columnName)}) AS interval_count
+        FROM interval
+        LEFT JOIN
+        ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)} 
+        ON ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)}  >= interval.interval_start 
+        AND ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)} < interval.interval_end
+        GROUP BY interval_label, interval_start
+        ORDER BY interval_start ASC;
+        """
+
+        sql.stripIndent()
     }
 
     @Override
