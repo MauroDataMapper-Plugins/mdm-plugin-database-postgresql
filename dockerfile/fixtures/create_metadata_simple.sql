@@ -167,3 +167,18 @@ TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 day', --date
 TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour', --timestamp
 TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour' --timestamp with timezone
 FROM populate;
+
+CREATE TABLE bigger_sample (
+sample_bigint BIGINT,
+sample_decimal DECIMAL(12, 3),
+sample_date DATE,
+sample_varchar VARCHAR(20)
+);
+WITH RECURSIVE populate AS (
+SELECT 1 AS x UNION ALL SELECT x + 1 FROM populate WHERE x < 500000
+)
+INSERT INTO bigger_sample (sample_bigint) SELECT x FROM populate;
+UPDATE bigger_sample
+SET sample_decimal = SIN(sample_bigint),
+sample_date = TO_DATE('2020-09-02', 'YYYY-MM-DD') + 200 * SIN(sample_bigint) * INTERVAL '1 hour',
+sample_varchar = CONCAT('ENUM'::VARCHAR, TO_CHAR(sample_bigint % 15,'FM99'));

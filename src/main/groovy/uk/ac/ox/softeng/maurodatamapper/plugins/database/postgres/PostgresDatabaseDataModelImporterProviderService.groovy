@@ -20,6 +20,7 @@ package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.SamplingStrategy
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.summarymetadata.AbstractIntervalHelper
 
 import java.sql.Connection
@@ -30,6 +31,11 @@ import java.time.format.DateTimeFormatter
 class PostgresDatabaseDataModelImporterProviderService
     extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
     implements RemoteDatabaseDataModelImporterProviderService {
+
+    @Override
+    SamplingStrategy getSamplingStrategy(PostgresDatabaseDataModelImporterProviderServiceParameters parameters) {
+        new SamplingStrategy(parameters.sampleThreshold ?: DEFAULT_SAMPLE_THRESHOLD, parameters.samplePercent ?: DEFAULT_SAMPLE_PERCENTAGE)
+    }
 
     @Override
     String getDisplayName() {
@@ -128,6 +134,25 @@ class PostgresDatabaseDataModelImporterProviderService
         "\"${identifier}\""
     }
 
+    /**
+     * Return a query that will select an approximate row count from the specified table.
+     * See https://wiki.postgresql.org/wiki/Count_estimate
+     *
+     * @param tableName
+     * @param schemaName
+     * @return
+     */
+    @Override
+    String approxCountQueryString(String tableName, String schemaName = null) {
+        String oid = tableName
+        if (schemaName) {
+            oid = schemaName + '.' + oid
+        }
+        """
+        SELECT reltuples::bigint AS approx_count FROM pg_class WHERE oid = '${oid}'::regclass
+        """
+    }
+
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
         dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
@@ -149,12 +174,60 @@ class PostgresDatabaseDataModelImporterProviderService
     }
 
     @Override
-    String columnRangeDistributionQueryString(DataType dataType, AbstractIntervalHelper intervalHelper, String columnName, String tableName, String schemaName) {
+    String countDistinctColumnValuesQueryString(SamplingStrategy samplingStrategy, String columnName, String tableName, String schemaName = null) {
+        String query = super.countDistinctColumnValuesQueryString(columnName, tableName, schemaName)
+
+        if (samplingStrategy.useSampling()) {
+            query = query + " TABLESAMPLE SYSTEM (${samplingStrategy.percentage})"
+        }
+
+        query
+    }
+
+    @Override
+    String distinctColumnValuesQueryString(SamplingStrategy samplingStrategy, String columnName, String tableName, String schemaName = null) {
+        String query = super.distinctColumnValuesQueryString(columnName, tableName, schemaName)
+
+        if (samplingStrategy.useSampling()) {
+            query = query + " TABLESAMPLE SYSTEM (${samplingStrategy.percentage})"
+        }
+
+        query
+    }
+
+    /**
+     * Use the superclass method to construct a query string, and then append a TABLESAMPLE clause if necessary
+     * @param samplingStrategy
+     * @param columnName
+     * @param tableName
+     * @param schemaName
+     * @return Query string, optionally with TABLESAMPLE clause appended
+     */
+    @Override
+    String minMaxColumnValuesQueryString(SamplingStrategy samplingStrategy, String columnName, String tableName, String schemaName = null) {
+        String query = super.minMaxColumnValuesQueryString(samplingStrategy, columnName, tableName, schemaName)
+
+        if (samplingStrategy.useSampling()) {
+            query = query + " TABLESAMPLE SYSTEM (${samplingStrategy.percentage})"
+        }
+
+        query
+    }
+
+    String columnRangeDistributionQueryString(DataType dataType,
+                                              AbstractIntervalHelper intervalHelper,
+                                              String columnName, String tableName, String schemaName) {
+        SamplingStrategy samplingStrategy = new SamplingStrategy()
+        columnRangeDistributionQueryString(samplingStrategy, dataType, intervalHelper, columnName, tableName, schemaName)
+    }
+
+    @Override
+    String columnRangeDistributionQueryString(SamplingStrategy samplingStrategy, DataType dataType, AbstractIntervalHelper intervalHelper, String columnName, String tableName, String schemaName) {
         List<String> selects = intervalHelper.intervals.collect {
             "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
         }
 
-        rangeDistributionQueryString(selects, columnName, tableName, schemaName)
+        rangeDistributionQueryString(samplingStrategy, selects, columnName, tableName, schemaName)
     }
 
     /**
@@ -192,15 +265,21 @@ class PostgresDatabaseDataModelImporterProviderService
      * @param selects
      * @return
      */
-    private String rangeDistributionQueryString(List<String> selects, String columnName, String tableName, String schemaName) {
+    private String rangeDistributionQueryString(SamplingStrategy samplingStrategy, List<String> selects, String columnName, String tableName, String schemaName) {
         String intervals = selects.join(" UNION ")
+
+        String tableSample = ""
+        if (samplingStrategy.useSampling()) {
+            tableSample = " TABLESAMPLE SYSTEM (${samplingStrategy.percentage}) "
+        }
 
         String sql = "WITH interval AS (${intervals})" +
                 """
-        SELECT interval_label, COUNT(${escapeIdentifier(columnName)}) AS interval_count
+        SELECT interval_label, ${samplingStrategy.scaleFactor()} * COUNT(${escapeIdentifier(columnName)}) AS interval_count
         FROM interval
         LEFT JOIN
         ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)} 
+        ${tableSample}
         ON ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)}  >= interval.interval_start 
         AND ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)} < interval.interval_end
         GROUP BY interval_label, interval_start
