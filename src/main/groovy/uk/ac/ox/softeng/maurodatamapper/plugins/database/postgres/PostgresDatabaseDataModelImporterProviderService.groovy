@@ -143,14 +143,16 @@ class PostgresDatabaseDataModelImporterProviderService
      * @return
      */
     @Override
-    String approxCountQueryString(String tableName, String schemaName = null) {
+    List<String> approxCountQueryString(String tableName, String schemaName = null) {
+        List<String> queryStrings = super.approxCountQueryString(tableName, schemaName)
         String oid = tableName
         if (schemaName) {
             oid = schemaName + '.' + oid
         }
-        """
-        SELECT reltuples::bigint AS approx_count FROM pg_class WHERE oid = '${oid}'::regclass
-        """
+        String query = "SELECT reltuples::bigint AS approx_count FROM pg_class WHERE oid = '${oid}'::regclass"
+
+        queryStrings.push(query.toString())
+        queryStrings
     }
 
     @Override
