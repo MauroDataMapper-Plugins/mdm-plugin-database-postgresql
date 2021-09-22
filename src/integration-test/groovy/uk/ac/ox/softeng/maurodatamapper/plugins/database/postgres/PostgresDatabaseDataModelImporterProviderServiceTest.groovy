@@ -17,6 +17,7 @@
  */
 package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
+import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
 import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataElement
@@ -166,6 +167,10 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
 
         assertEquals 'Database/Model name', expectedDataBase, dataModel.label
 
+        assertTrue 'COMMENT is present', dataModel.getMetadata().any{ Metadata md ->
+            md.key == 'COMMENT' && md.value == 'A database called metadata_simple which is used for integration testing'
+        }
+
         //Number of DataClasses is 1 for the schema, plus the number of tables in the schema
         assertEquals 'Number of tables/dataclasses', 1 + expectedTables.size(), dataModel.dataClasses?.size()
 
@@ -242,6 +247,20 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
 
     }
 
+    private void checkOrganisationMetadata(DataClass organisationTable) {
+        // Expect 4 metadata - 2 for the primary key and 1 for indexes, 1 for extended property
+        assertEquals 'Organisation Number of metadata', 4, organisationTable.metadata.size()
+
+        assertTrue 'COMMENT exists on organisation', organisationTable.getMetadata().any {Metadata md ->
+            md.key == 'COMMENT' && md.value == 'A table about organisations'
+        }
+
+        DataElement org_code = organisationTable.findDataElement('org_code')
+        assertTrue "COMMENT exists on org_code", org_code.getMetadata().any{ Metadata md ->
+            md.key == 'COMMENT' && md.value == 'A column of organisation codes'
+        }
+    }
+
     private void checkOrganisationNotEnumerated(DataModel dataModel) {
         final DataClass publicSchema = dataModel.childDataClasses.first()
         final Set<DataClass> dataClasses = publicSchema.dataClasses
@@ -257,13 +276,13 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         ]
 
         assertEquals 'Organisation Number of columns/dataElements', expectedColumns.size(), organisationTable.dataElements.size()
-        // Expect 3 metadata - 2 for the primary key and 1 for indexes
-        assertEquals 'Organisation Number of metadata', 3, organisationTable.metadata.size()
         //Expect all types to be Primitive, because we are not detecting enumerations
         expectedColumns.each {
             columnName, columnType ->
                 assertEquals "DomainType of the DataType for ${columnName}", columnType, organisationTable.findDataElement(columnName).dataType.domainType
         }
+
+        checkOrganisationMetadata(organisationTable)
     }
 
     private void checkOrganisationEnumerated(DataModel dataModel) {
@@ -281,13 +300,13 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         ]
 
         assertEquals 'Organisation Number of columns/dataElements', expectedColumns.size(), organisationTable.dataElements.size()
-        // Expect 3 metadata - 2 for the primary key and 1 for indexes
-        assertEquals 'Organisation Number of metadata', 3, organisationTable.metadata.size()
         //Expect all types to be Primitive, because we are not detecting enumerations
         expectedColumns.each {
             columnName, columnType ->
                 assertEquals "DomainType of the DataType for ${columnName}", columnType, organisationTable.findDataElement(columnName).dataType.domainType
         }
+
+        checkOrganisationMetadata(organisationTable)
 
 
         final EnumerationType orgCodeEnumerationType = organisationTable.findDataElement('org_code').dataType

@@ -2,6 +2,9 @@ CREATE DATABASE metadata_simple OWNER maurodatamapper;
 
 \c metadata_simple;
 
+COMMENT ON DATABASE metadata_simple IS 'A database called metadata_simple which is used for integration testing';
+COMMENT ON SCHEMA public IS 'Contains objects used for testing';
+
 CREATE TABLE IF NOT EXISTS catalogue_item (
     id            UUID         NOT NULL
         CONSTRAINT catalogue_item_pkey
@@ -94,6 +97,10 @@ CREATE TABLE organisation
   description VARCHAR,
   org_char CHAR(5)
 );
+
+COMMENT ON TABLE organisation IS 'A table about organisations';
+COMMENT ON COLUMN organisation.org_code IS 'A column of organisation codes';
+
 --Use both VARCHAR and CHAR columns. Expect that because there are no CHAR columns other than org_char,
 --when org_char is detected as an enumeration, CHAR will be removed from the primitive data types
 INSERT INTO organisation(id, org_name, org_type, org_code, description, org_char) VALUES
