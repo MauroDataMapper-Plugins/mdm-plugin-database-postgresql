@@ -163,7 +163,7 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
     private void checkBasic(DataModel dataModel) {
         String expectedDataBase = "metadata_simple"
         String expectedSchema = "public";
-        List<String> expectedTables = ["catalogue_item", "catalogue_user", "metadata", "organisation", "sample", "bigger_sample"]
+        List<String> expectedTables = ["catalogue_item", "catalogue_user", "metadata", "organisation", "sample", "bigger_sample", "bigger_sample_view"]
 
         assertEquals 'Database/Model name', expectedDataBase, dataModel.label
 

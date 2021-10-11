@@ -189,3 +189,5 @@ UPDATE bigger_sample
 SET sample_decimal = SIN(sample_bigint),
 sample_date = TO_DATE('2020-09-02', 'YYYY-MM-DD') + 200 * SIN(sample_bigint) * INTERVAL '1 hour',
 sample_varchar = CONCAT('ENUM'::VARCHAR, TO_CHAR(sample_bigint % 15,'FM99'));
+
+CREATE VIEW bigger_sample_view AS SELECT * FROM bigger_sample;
