@@ -473,7 +473,7 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
                 "sample_bigint": ['Value Distribution':'{"0 - 100000":99999,"100000 - 200000":100000,"200000 - 300000":100000,"300000 - 400000":100000,"400000 - 500000":100000,"500000 - 600000":1}'],
                 "sample_decimal": ['Value Distribution':'{"-1.000 - 0.000":249924,"0.000 - 1.000":245051,"1.000 - 2.000":5025}'],
                 "sample_date": ['Value Distribution':'{"24/08/2020 - 26/08/2020":91266,"26/08/2020 - 28/08/2020":56304,"28/08/2020 - 30/08/2020":43810,"30/08/2020 - 01/09/2020":39468,"01/09/2020 - 03/09/2020":38302,"03/09/2020 - 05/09/2020":39468,"05/09/2020 - 07/09/2020":43810,"07/09/2020 - 09/09/2020":56306,"09/09/2020 - 11/09/2020":91266}'],
-                "sample_varchar": []
+                "sample_varchar": ['Enumeration Value Distribution':'{"ENUM0":33333,"ENUM1":33334,"ENUM10":33333,"ENUM11":33333,"ENUM12":33333,"ENUM13":33333,"ENUM14":33333,"ENUM2":33334,"ENUM3":33334,"ENUM4":33334,"ENUM5":33334,"ENUM6":33333,"ENUM7":33333,"ENUM8":33333,"ENUM9":33333}']
         ]
 
         assertEquals 'Sample Number of columns/dataElements', expectedColumns.size(), sampleTable.dataElements.size()
