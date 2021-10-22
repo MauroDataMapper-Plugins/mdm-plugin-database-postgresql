@@ -2,6 +2,9 @@ CREATE DATABASE metadata_simple OWNER maurodatamapper;
 
 \c metadata_simple;
 
+COMMENT ON DATABASE metadata_simple IS 'A database called metadata_simple which is used for integration testing';
+COMMENT ON SCHEMA public IS 'Contains objects used for testing';
+
 CREATE TABLE IF NOT EXISTS catalogue_item (
     id            UUID         NOT NULL
         CONSTRAINT catalogue_item_pkey
@@ -94,6 +97,10 @@ CREATE TABLE organisation
   description VARCHAR,
   org_char CHAR(5)
 );
+
+COMMENT ON TABLE organisation IS 'A table about organisations';
+COMMENT ON COLUMN organisation.org_code IS 'A column of organisation codes';
+
 --Use both VARCHAR and CHAR columns. Expect that because there are no CHAR columns other than org_char,
 --when org_char is detected as an enumeration, CHAR will be removed from the primitive data types
 INSERT INTO organisation(id, org_name, org_type, org_code, description, org_char) VALUES
@@ -137,3 +144,50 @@ INSERT INTO organisation(id, org_name, org_type, org_code, description, org_char
 (38, 'ORG38', 'TYPEB', 'CODEX', 'Description of ORG38', 'CHAR3'),
 (39, 'ORG39', 'TYPEB', 'CODEX', 'Description of ORG39', 'CHAR3'),
 (40, 'ORG40', 'TYPEB', 'CODER', 'Description of ORG40', 'CHAR3');
+
+CREATE TABLE sample
+(
+  id SERIAL PRIMARY KEY,
+  sample_smallint SMALLINT,
+  sample_int INTEGER,
+  sample_bigint BIGINT,
+  sample_decimal DECIMAL(12,3),
+  sample_numeric NUMERIC(10,6),
+  sample_date DATE,
+  sample_timestamp_without_tz TIMESTAMP,
+  sample_timestamp_with_tz TIMESTAMP WITH TIME ZONE
+);
+
+--sample data: sample_smallint goes from -100 to 100. sample_int goes from 0 to 10000.
+--sample_bigint goes from -1000000 to 1000000
+WITH RECURSIVE populate AS (
+SELECT -100 AS x UNION ALL SELECT x + 1 FROM populate WHERE x < 100
+)
+INSERT INTO sample (sample_smallint, sample_int, sample_bigint, sample_decimal, sample_numeric, sample_date, sample_timestamp_without_tz, sample_timestamp_with_tz)
+SELECT
+x, --smallint
+x*x, --integer
+x*x*x, --bigint
+x*x * 573, --decimal
+x*x*x / 104756.576, --numeric
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 day', --date
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour', --timestamp
+TO_DATE('2020-09-01', 'YYYY-MM-DD') + x * INTERVAL '1 hour' --timestamp with timezone
+FROM populate;
+
+CREATE TABLE bigger_sample (
+sample_bigint BIGINT,
+sample_decimal DECIMAL(12, 3),
+sample_date DATE,
+sample_varchar VARCHAR(20)
+);
+WITH RECURSIVE populate AS (
+SELECT 1 AS x UNION ALL SELECT x + 1 FROM populate WHERE x < 500000
+)
+INSERT INTO bigger_sample (sample_bigint) SELECT x FROM populate;
+UPDATE bigger_sample
+SET sample_decimal = SIN(sample_bigint),
+sample_date = TO_DATE('2020-09-02', 'YYYY-MM-DD') + 200 * SIN(sample_bigint) * INTERVAL '1 hour',
+sample_varchar = CONCAT('ENUM'::VARCHAR, TO_CHAR(sample_bigint % 15,'FM99'));
+
+CREATE VIEW bigger_sample_view AS SELECT * FROM bigger_sample;

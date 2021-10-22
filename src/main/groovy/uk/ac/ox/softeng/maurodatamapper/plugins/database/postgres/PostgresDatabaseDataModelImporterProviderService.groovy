@@ -17,17 +17,30 @@
  */
 package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
+import uk.ac.ox.softeng.maurodatamapper.core.facet.Metadata
+import uk.ac.ox.softeng.maurodatamapper.core.model.facet.MetadataAware
+import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
+import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataElement
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.SamplingStrategy
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.summarymetadata.AbstractIntervalHelper
 
 import java.sql.Connection
 import java.sql.PreparedStatement
+import java.time.format.DateTimeFormatter
 
 // @CompileStatic
 class PostgresDatabaseDataModelImporterProviderService
     extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
     implements RemoteDatabaseDataModelImporterProviderService {
+
+    @Override
+    SamplingStrategy getSamplingStrategy(PostgresDatabaseDataModelImporterProviderServiceParameters parameters) {
+        new PostgresSamplingStrategy(parameters.sampleThreshold ?: DEFAULT_SAMPLE_THRESHOLD, parameters.samplePercent ?: DEFAULT_SAMPLE_PERCENTAGE)
+    }
 
     @Override
     String getDisplayName() {
@@ -118,21 +131,123 @@ class PostgresDatabaseDataModelImporterProviderService
         '''.stripIndent()
     }
 
-    //PostgreSQL quote escaping of identifiers
+    /**
+     * PostgreSQL identifiers escaped in double quotes.
+     */
     @Override
-    String countDistinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT COUNT(DISTINCT(\"${columnName}\")) AS count FROM \"${tableName}\";"
+    String escapeIdentifier(String identifier) {
+        "\"${identifier}\""
     }
 
-    //PostgreSQL quote escaping of identifiers
+    /**
+     * Return a query that will select an approximate row count from the specified table.
+     * See https://wiki.postgresql.org/wiki/Count_estimate
+     *
+     * @param tableName
+     * @param schemaName
+     * @return
+     */
     @Override
-    String distinctColumnValuesQueryString(String tableName, String columnName) {
-        "SELECT DISTINCT(\"${columnName}\") AS distinct_value FROM \"${tableName}\";"
+    List<String> approxCountQueryString(String tableName, String schemaName = null) {
+        List<String> queryStrings = super.approxCountQueryString(tableName, schemaName)
+        String oid = tableName
+        if (schemaName) {
+            oid = schemaName + '.' + oid
+        }
+        String query = "SELECT reltuples::bigint AS approx_count FROM pg_class WHERE oid = '${oid}'::regclass"
+
+        queryStrings.push(query.toString())
+        queryStrings
     }
 
     @Override
     boolean isColumnPossibleEnumeration(DataType dataType) {
         dataType.domainType == 'PrimitiveType' && (dataType.label == "character" || dataType.label == "character varying")
+    }
+
+    @Override
+    boolean isColumnForDateSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["date", "timestamp without time zone", "timestamp with time zone"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForDecimalSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["decimal", "numeric"].contains(dataType.label)
+    }
+
+    @Override
+    boolean isColumnForIntegerSummary(DataType dataType) {
+        dataType.domainType == 'PrimitiveType' && ["smallint", "integer", "bigint"].contains(dataType.label)
+    }
+
+    String columnRangeDistributionQueryString(DataType dataType,
+                                              AbstractIntervalHelper intervalHelper,
+                                              String columnName, String tableName, String schemaName) {
+        SamplingStrategy samplingStrategy = new SamplingStrategy()
+        columnRangeDistributionQueryString(samplingStrategy, dataType, intervalHelper, columnName, tableName, schemaName)
+    }
+
+    @Override
+    String columnRangeDistributionQueryString(SamplingStrategy samplingStrategy, DataType dataType, AbstractIntervalHelper intervalHelper, String columnName, String tableName, String schemaName) {
+        List<String> selects = intervalHelper.intervals.collect {
+            "SELECT '${it.key}' AS interval_label, ${formatDataType(dataType, it.value.aValue)} AS interval_start, ${formatDataType(dataType, it.value.bValue)} AS interval_end"
+        }
+
+        rangeDistributionQueryString(samplingStrategy, selects, columnName, tableName, schemaName)
+    }
+
+    /**
+     * Return a string which uses the PostgreSQL TO_TIMESTAMP function for Dates, otherwise string formatting
+     *
+     * @param dataType
+     * @param value
+     * @return Fragment of query string, either TO_TIMESTAMP or value
+     */
+    String formatDataType(DataType dataType, Object value) {
+        if (isColumnForDateSummary(dataType)){
+            "TO_TIMESTAMP('${DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(value)}', 'YYYY-MM-DDTHH:MI:SS')"
+        } else {
+            "${value}"
+        }
+    }
+
+    /**
+     * Returns a String that looks, for example, like this:
+     * WITH interval AS (
+     *   SELECT '0 - 100' AS interval_label, 0 AS interval_start, 100 AS interval_end
+     *   UNION
+     *   SELECT '100 - 200' AS interval_label, 100 AS interval_start, 200 AS interval_end
+     * )
+     * SELECT interval_label, COUNT("my_column") AS interval_count
+     * FROM interval
+     * LEFT JOIN
+     * "my_schema"."my_table" ON "my_schema"."my_table"."my_column" >= #interval.interval_start AND "my_schema"."my_table"."my_column" < #interval.interval_end
+     * GROUP BY interval_label, interval_start
+     * ORDER BY interval_start ASC;
+     *
+     * @param schemaName
+     * @param tableName
+     * @param columnName
+     * @param selects
+     * @return
+     */
+    private String rangeDistributionQueryString(SamplingStrategy samplingStrategy, List<String> selects, String columnName, String tableName, String schemaName) {
+        String intervals = selects.join(" UNION ")
+
+        String sql = "WITH interval AS (${intervals})" +
+                """
+        SELECT interval_label, ${samplingStrategy.scaleFactor()} * COUNT(${escapeIdentifier(columnName)}) AS interval_count
+        FROM interval
+        LEFT JOIN
+        ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)} 
+        ${samplingStrategy.samplingClause()}
+        ON ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)}  >= interval.interval_start 
+        AND ${escapeIdentifier(schemaName)}.${escapeIdentifier(tableName)}.${escapeIdentifier(columnName)} < interval.interval_end
+        GROUP BY interval_label, interval_start
+        ORDER BY interval_start ASC;
+        """
+
+        sql.stripIndent()
     }
 
     @Override
@@ -143,5 +258,57 @@ class PostgresDatabaseDataModelImporterProviderService
             """SELECT * FROM information_schema.columns WHERE table_schema IN (${names.collect {'?'}.join(',')});""")
         names.eachWithIndex {String name, int i -> statement.setString(i + 1, name)}
         statement
+    }
+
+    /**
+     * Use PostgreSQL functions to get comments. There can only be one comment per object.
+     * See https://www.postgresql.org/docs/13/functions-info.html#FUNCTIONS-INFO-COMMENT-TABLE
+     * @param dataModel
+     * @param connection
+     */
+    @Override
+    void addMetadata(DataModel dataModel, Connection connection) {
+        //Get comment for the database
+        String databaseQuery = """
+        SELECT pg_catalog.shobj_description(d.oid, 'pg_database') AS "COMMENT"
+        FROM pg_catalog.pg_database d
+        WHERE datname = '${dataModel.label}'
+        """
+        addComment(connection, databaseQuery, dataModel, dataModel.createdBy)
+
+        dataModel.childDataClasses.each { DataClass schemaClass ->
+            //Get comment for the schema
+            String schemaQuery = """
+            SELECT obj_description('${schemaClass.label}'::regnamespace, 'pg_namespace');
+            """
+            addComment(connection, schemaQuery, schemaClass, dataModel.createdBy)
+
+            schemaClass.dataClasses.each { DataClass tableClass ->
+                String tableQuery = """
+                SELECT pg_catalog.obj_description('${schemaClass.label}.${tableClass.label}'::regclass, 'pg_class') AS "COMMENT"
+                """
+                addComment(connection, tableQuery, tableClass, dataModel.createdBy)
+                tableClass.dataElements.each {DataElement column ->
+                    Metadata ordinalPosition = column.getMetadata().find {
+                        it.key == 'ordinal_position'
+                    }
+                    if (ordinalPosition) {
+                        String columnQuery = """
+                        SELECT pg_catalog.col_description('${schemaClass.label}.${tableClass.label}'::regclass, ${ordinalPosition.value}) AS "COMMENT"
+                        """
+                        addComment(connection, columnQuery, column, dataModel.createdBy)
+                    }
+                }
+            }
+        }
+    }
+
+    private void addComment(Connection connection, String query, MetadataAware ma, String createdBy) {
+        final PreparedStatement preparedStatement = connection.prepareStatement(query)
+        final List<Map<String, Object>> results = executeStatement(preparedStatement)
+
+        if (results && results[0].comment) {
+            ma.addToMetadata(namespace, 'COMMENT', results[0].comment as String, createdBy)
+        }
     }
 }
