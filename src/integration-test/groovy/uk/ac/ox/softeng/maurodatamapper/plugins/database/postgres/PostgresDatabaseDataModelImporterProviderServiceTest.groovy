@@ -65,8 +65,9 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         checkSampleNoSummaryMetadata(dataModel)
         checkBiggerSampleNoSummaryMetadata(dataModel)
 
-        assertEquals 'Number of columntypes/datatypes', 15, dataModel.dataTypes?.size()
-        assertEquals 'Number of primitive types', 13, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
+        assertEquals 'Number of columntypes/datatypes', 50, dataModel.dataTypes?.size()
+        assertTrue 'All primitive DTs map to a default DT', dataModel.primitiveTypes.findAll {!(it.label in importerInstance.defaultDataTypeProvider.defaultListOfDataTypes.collect {it.label})}.isEmpty()
+        assertEquals 'Number of primitive types', 48, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
         assertEquals 'Number of reference types', 2, dataModel.dataTypes.findAll {it.domainType == 'ReferenceType'}.size()
         assertEquals 'Number of enumeration types', 0, dataModel.dataTypes.findAll {it.domainType == 'EnumerationType'}.size()
         assertEquals 'Number of char datatypes', 1, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType' && it.label == 'character'}.size()
@@ -85,8 +86,8 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         checkSampleNoSummaryMetadata(dataModel)
         checkBiggerSampleNoSummaryMetadata(dataModel)
 
-        assertEquals 'Number of columntypes/datatypes', 18, dataModel.dataTypes?.size()
-        assertEquals 'Number of primitive types', 12, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
+        assertEquals 'Number of columntypes/datatypes', 53, dataModel.dataTypes?.size()
+        assertEquals 'Number of primitive types', 48, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType'}.size()
         assertEquals 'Number of reference types', 2, dataModel.dataTypes.findAll {it.domainType == 'ReferenceType'}.size()
         assertEquals 'Number of enumeration types', 4, dataModel.dataTypes.findAll {it.domainType == 'EnumerationType'}.size()
         assertEquals 'Number of char datatypes', 0, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType' && it.label == 'character'}.size()
