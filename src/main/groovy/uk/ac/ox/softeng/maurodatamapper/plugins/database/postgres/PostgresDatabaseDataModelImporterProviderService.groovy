@@ -23,10 +23,13 @@ import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataElement
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.DataType
+import uk.ac.ox.softeng.maurodatamapper.datamodel.provider.DefaultDataTypeProvider
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.AbstractDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.RemoteDatabaseDataModelImporterProviderService
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.SamplingStrategy
 import uk.ac.ox.softeng.maurodatamapper.plugins.database.summarymetadata.AbstractIntervalHelper
+
+import org.springframework.beans.factory.annotation.Autowired
 
 import java.sql.Connection
 import java.sql.PreparedStatement
@@ -36,6 +39,9 @@ import java.time.format.DateTimeFormatter
 class PostgresDatabaseDataModelImporterProviderService
     extends AbstractDatabaseDataModelImporterProviderService<PostgresDatabaseDataModelImporterProviderServiceParameters>
     implements RemoteDatabaseDataModelImporterProviderService {
+
+    @Autowired
+    PostgresDataTypeProvider postgresDataTypeProvider
 
     @Override
     SamplingStrategy getSamplingStrategy(PostgresDatabaseDataModelImporterProviderServiceParameters parameters) {
@@ -66,6 +72,11 @@ class PostgresDatabaseDataModelImporterProviderService
     @Override
     Boolean allowsExtraMetadataKeys() {
         true
+    }
+
+    @Override
+    DefaultDataTypeProvider getDefaultDataTypeProvider() {
+        postgresDataTypeProvider
     }
 
     @Override
