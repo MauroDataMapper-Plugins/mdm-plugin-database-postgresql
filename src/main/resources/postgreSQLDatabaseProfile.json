@@ -1,0 +1,23 @@
+[
+  {
+    "sectionName": "Database Properties",
+    "fields": [
+      {
+        "fieldName": "Dialect",
+        "metadataPropertyName": "dialect",
+        "minMultiplicity": 1,
+        "maxMultiplicity": 1,
+        "dataType": "string",
+        "derived": false
+      },
+      {
+        "fieldName": "Comment",
+        "metadataPropertyName": "COMMENT",
+        "minMultiplicity": 0,
+        "maxMultiplicity": 1,
+        "dataType": "string",
+        "derived": false
+      }
+    ]
+  }
+]

@@ -17,6 +17,9 @@
  */
 package uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres
 
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.column.PostgresColumnProfileProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.schema.PostgresSchemaProfileProviderService
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.table.PostgresTableProfileProviderService
 import uk.ac.ox.softeng.maurodatamapper.provider.plugin.AbstractMauroDataMapperPlugin
 
 class PostgresDatabasePlugin extends AbstractMauroDataMapperPlugin {
@@ -31,6 +34,10 @@ class PostgresDatabasePlugin extends AbstractMauroDataMapperPlugin {
         {->
             postgresDatabaseDataModelImporterProviderService PostgresDatabaseDataModelImporterProviderService
             postgresDataTypeProvider PostgresDataTypeProvider
+            postgresDatabaseProfileProviderService PostgresDatabaseProfileProviderService
+            postgresSchemaProfileProviderService PostgresSchemaProfileProviderService
+            postgresTableProfileProviderService PostgresTableProfileProviderService
+            postgresColumnProfileProviderService PostgresColumnProfileProviderService
         }
     }
 }
