@@ -37,7 +37,7 @@ class PostgresColumnProfileProviderService extends JsonProfileProviderService {
 
     @Override
     String getJsonResourceFile() {
-        'postgreSQLColumnProfile.json'
+        'PostgresColumnProfile.json'
     }
 
     @Override

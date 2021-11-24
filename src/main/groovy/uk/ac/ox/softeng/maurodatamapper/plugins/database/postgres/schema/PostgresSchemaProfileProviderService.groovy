@@ -37,7 +37,7 @@ class PostgresSchemaProfileProviderService extends JsonProfileProviderService {
 
     @Override
     String getJsonResourceFile() {
-        'postgreSQLSchemaProfile.json'
+        'PostgresSchemaProfile.json'
     }
 
     @Override

@@ -37,7 +37,7 @@ class PostgresDatabaseProfileProviderService extends JsonProfileProviderService 
 
     @Override
     String getJsonResourceFile() {
-        'postgreSQLDatabaseProfile.json'
+        'PostgresDatabaseProfile.json'
     }
 
     @Override

@@ -45,7 +45,7 @@
       {
         "fieldName": "Character Maximum Length",
         "metadataPropertyName": "character_maximum_length",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -53,7 +53,7 @@
       {
         "fieldName": "Character Octet Length",
         "metadataPropertyName": "character_octet_length",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -61,7 +61,7 @@
       {
         "fieldName": "Character Set Catalog",
         "metadataPropertyName": "character_set_catalog",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -69,7 +69,7 @@
       {
         "fieldName": "Character Set Name",
         "metadataPropertyName": "character_set_name",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -77,7 +77,7 @@
       {
         "fieldName": "Character Set Schema",
         "metadataPropertyName": "character_set_schema",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -85,7 +85,7 @@
       {
         "fieldName": "Collation Catalog",
         "metadataPropertyName": "collation_catalog",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -93,7 +93,7 @@
       {
         "fieldName": "Collation Name",
         "metadataPropertyName": "collation_name",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -101,7 +101,7 @@
       {
         "fieldName": "Collation Schema",
         "metadataPropertyName": "collation_schema",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -109,7 +109,7 @@
       {
         "fieldName": "Column Default",
         "metadataPropertyName": "column_default",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -117,7 +117,7 @@
       {
         "fieldName": "Datetime Precision",
         "metadataPropertyName": "datetime_precision",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -125,7 +125,7 @@
       {
         "fieldName": "Domain Catalog",
         "metadataPropertyName": "domain_catalog",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -133,7 +133,7 @@
       {
         "fieldName": "Domain Name",
         "metadataPropertyName": "domain_name",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -141,7 +141,7 @@
       {
         "fieldName": "Domain Schema",
         "metadataPropertyName": "domain_schema",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -149,7 +149,7 @@
       {
         "fieldName": "DTD Identifier",
         "metadataPropertyName": "dtd_identifier",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -157,7 +157,7 @@
       {
         "fieldName": "Generation Expression",
         "metadataPropertyName": "generation_expression",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -165,7 +165,7 @@
       {
         "fieldName": "Identity Cycle",
         "metadataPropertyName": "identity_cycle",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -173,7 +173,7 @@
       {
         "fieldName": "Identity Generation",
         "metadataPropertyName": "identity_generation",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -181,7 +181,7 @@
       {
         "fieldName": "Identity Increment",
         "metadataPropertyName": "identity_increment",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -189,7 +189,7 @@
       {
         "fieldName": "Identity Maximum",
         "metadataPropertyName": "identity_maximum",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -197,7 +197,7 @@
       {
         "fieldName": "Identity Minimum",
         "metadataPropertyName": "identity_minimum",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -205,7 +205,7 @@
       {
         "fieldName": "Identity Start",
         "metadataPropertyName": "identity_start",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -213,7 +213,7 @@
       {
         "fieldName": "Interval Precision",
         "metadataPropertyName": "interval_precision",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -221,7 +221,7 @@
       {
         "fieldName": "Interval Type",
         "metadataPropertyName": "interval_type",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -229,7 +229,7 @@
       {
         "fieldName": "Is Generated",
         "metadataPropertyName": "is_generated",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -237,7 +237,7 @@
       {
         "fieldName": "Is Identity",
         "metadataPropertyName": "is_identity",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -245,7 +245,7 @@
       {
         "fieldName": "Is Nullable",
         "metadataPropertyName": "is_nullable",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -253,7 +253,7 @@
       {
         "fieldName": "Is Self Referencing",
         "metadataPropertyName": "is_self_referencing",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -261,7 +261,7 @@
       {
         "fieldName": "Is Updatable",
         "metadataPropertyName": "is_updatable",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -269,7 +269,7 @@
       {
         "fieldName": "Maximum Cardinality",
         "metadataPropertyName": "maximum_cardinality",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -277,7 +277,7 @@
       {
         "fieldName": "Numeric Precision",
         "metadataPropertyName": "numeric_precision",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -285,7 +285,7 @@
       {
         "fieldName": "Numeric Precision Radix",
         "metadataPropertyName": "numeric_precision_radix",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -293,7 +293,7 @@
       {
         "fieldName": "Numeric Scale",
         "metadataPropertyName": "numeric_scale",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -301,7 +301,7 @@
       {
         "fieldName": "Ordinal Position",
         "metadataPropertyName": "ordinal_position",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "int",
         "derived": false
@@ -309,7 +309,7 @@
       {
         "fieldName": "Scope Catalog",
         "metadataPropertyName": "scope_catalog",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -317,7 +317,7 @@
       {
         "fieldName": "Scope Name",
         "metadataPropertyName": "scope_name",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -325,7 +325,7 @@
       {
         "fieldName": "Scope Schema",
         "metadataPropertyName": "scope_schema",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -333,7 +333,7 @@
       {
         "fieldName": "UDT Catalog",
         "metadataPropertyName": "udt_catalog",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -341,7 +341,7 @@
       {
         "fieldName": "UDT Name",
         "metadataPropertyName": "udt_name",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
@@ -349,7 +349,7 @@
       {
         "fieldName": "UDT Schema",
         "metadataPropertyName": "udt_schema",
-        "minMultiplicity": 1,
+        "minMultiplicity": 0,
         "maxMultiplicity": 1,
         "dataType": "string",
         "derived": false
