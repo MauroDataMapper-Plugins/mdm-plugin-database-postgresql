@@ -59,6 +59,26 @@ class PostgresDatabaseDataModelImporterProviderService
     }
 
     @Override
+    String namespaceColumn() {
+        "uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.column"
+    }
+
+    @Override
+    String namespaceTable() {
+        "uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.table"
+    }
+
+    @Override
+    String namespaceSchema() {
+        "uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.schema"
+    }
+
+    @Override
+    String namespaceDatabase() {
+        "uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres"
+    }
+
+    @Override
     Set<String> getKnownMetadataKeys() {
         ['character_maximum_length', 'character_octet_length', 'character_set_catalog', 'character_set_name', 'character_set_schema',
          'collation_catalog', 'collation_name', 'collation_schema', 'column_default', 'datetime_precision', 'domain_catalog', 'domain_name',
@@ -285,20 +305,20 @@ class PostgresDatabaseDataModelImporterProviderService
         FROM pg_catalog.pg_database d
         WHERE datname = '${dataModel.label}'
         """
-        addComment(connection, databaseQuery, dataModel, dataModel.createdBy)
+        addComment(connection, databaseQuery, dataModel, dataModel.createdBy, namespaceDatabase())
 
         dataModel.childDataClasses.each { DataClass schemaClass ->
             //Get comment for the schema
             String schemaQuery = """
-            SELECT obj_description('${schemaClass.label}'::regnamespace, 'pg_namespace');
+            SELECT obj_description('${schemaClass.label}'::regnamespace, 'pg_namespace') AS "COMMENT"
             """
-            addComment(connection, schemaQuery, schemaClass, dataModel.createdBy)
+            addComment(connection, schemaQuery, schemaClass, dataModel.createdBy, namespaceSchema())
 
             schemaClass.dataClasses.each { DataClass tableClass ->
                 String tableQuery = """
                 SELECT pg_catalog.obj_description('${schemaClass.label}.${tableClass.label}'::regclass, 'pg_class') AS "COMMENT"
                 """
-                addComment(connection, tableQuery, tableClass, dataModel.createdBy)
+                addComment(connection, tableQuery, tableClass, dataModel.createdBy, namespaceTable())
                 tableClass.dataElements.each {DataElement column ->
                     Metadata ordinalPosition = column.getMetadata().find {
                         it.key == 'ordinal_position'
@@ -307,19 +327,19 @@ class PostgresDatabaseDataModelImporterProviderService
                         String columnQuery = """
                         SELECT pg_catalog.col_description('${schemaClass.label}.${tableClass.label}'::regclass, ${ordinalPosition.value}) AS "COMMENT"
                         """
-                        addComment(connection, columnQuery, column, dataModel.createdBy)
+                        addComment(connection, columnQuery, column, dataModel.createdBy, namespaceColumn())
                     }
                 }
             }
         }
     }
 
-    private void addComment(Connection connection, String query, MetadataAware ma, String createdBy) {
+    private void addComment(Connection connection, String query, MetadataAware ma, String createdBy, String metadataNamespace) {
         final PreparedStatement preparedStatement = connection.prepareStatement(query)
         final List<Map<String, Object>> results = executeStatement(preparedStatement)
 
         if (results && results[0].comment) {
-            ma.addToMetadata(namespace, 'COMMENT', results[0].comment as String, createdBy)
+            ma.addToMetadata(metadataNamespace, 'COMMENT', results[0].comment as String, createdBy)
         }
     }
 }
