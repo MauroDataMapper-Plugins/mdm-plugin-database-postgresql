@@ -25,7 +25,7 @@ import uk.ac.ox.softeng.maurodatamapper.datamodel.rest.transport.DefaultDataType
 import groovy.transform.CompileStatic
 
 @CompileStatic
-class PostgresDataTypeProvider implements DefaultDataTypeProvider {
+class PostgresDataTypeProviderService implements DefaultDataTypeProvider {
 
     @Override
     String getDisplayName() {

@@ -22,11 +22,12 @@ import uk.ac.ox.softeng.maurodatamapper.datamodel.DataModel
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataClass
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.DataElement
 import uk.ac.ox.softeng.maurodatamapper.datamodel.item.datatype.EnumerationType
-import uk.ac.ox.softeng.maurodatamapper.plugins.testing.utils.BaseDatabasePluginTest
+import uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.parameters.PostgresDatabaseDataModelImporterProviderServiceParameters
 
+import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
-import org.junit.Test
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
@@ -35,8 +36,14 @@ import static org.junit.Assert.assertTrue
 
 // @CompileStatic
 @Slf4j
-class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabasePluginTest<PostgresDatabaseDataModelImporterProviderServiceParameters,
-    PostgresDatabaseDataModelImporterProviderService> {
+@Integration
+@Rollback
+class PostgresDatabaseDataModelImporterProviderServiceTest
+    extends BaseDatabasePluginTest<
+        PostgresDatabaseDataModelImporterProviderServiceParameters,
+        PostgresDatabaseDataModelImporterProviderService> {
+
+    PostgresDatabaseDataModelImporterProviderService postgresDatabaseDataModelImporterProviderService
 
     @Override
     String getDatabasePortPropertyName() {
@@ -49,6 +56,11 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
     }
 
     @Override
+    PostgresDatabaseDataModelImporterProviderService getImporterInstance() {
+        postgresDatabaseDataModelImporterProviderService
+    }
+
+    @Override
     PostgresDatabaseDataModelImporterProviderServiceParameters createDatabaseImportParameters() {
         new PostgresDatabaseDataModelImporterProviderServiceParameters().tap {
             databaseNames = 'maurodatamapper_test'
@@ -57,11 +69,15 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         }
     }
 
-    @Test
-    void testImportSimpleDatabase() {
+    void 'test Import Simple Database'() {
+        given:
+        setupData()
+
+        when:
         final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
             createDatabaseImportParameters(databaseHost, databasePort).tap {databaseNames = 'metadata_simple'})
 
+        then:
         checkBasic(dataModel)
         checkOrganisationNotEnumerated(dataModel)
         checkSampleNoSummaryMetadata(dataModel)
@@ -78,14 +94,19 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         assertEquals 'Number of char datatypes', 1, dataModel.dataTypes.findAll {it.domainType == 'PrimitiveType' && it.label == 'character'}.size()
     }
 
-    @Test
-    void testImportSimpleDatabaseWithEnumerations() {
-        final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
-                createDatabaseImportParameters(databaseHost, databasePort).tap {
-                    databaseNames = 'metadata_simple';
-                    detectEnumerations = true;
-                    maxEnumerations = 20})
+    void 'EV : Test Import Simple Database With Enumerations'() {
+        given:
+        setupData()
 
+        when:
+        final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
+            createDatabaseImportParameters(databaseHost, databasePort).tap {
+                databaseNames = 'metadata_simple'
+                detectEnumerations = true
+                maxEnumerations = 20
+            })
+
+        then:
         checkBasic(dataModel)
         checkOrganisationEnumerated(dataModel)
         checkSampleNoSummaryMetadata(dataModel)
@@ -101,35 +122,53 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         assertEquals 'Number of enumeration types', 4, dataModel.dataTypes.findAll {it.domainType == 'EnumerationType'}.size()
     }
 
-    @Test
-    void 'testImportSimpleDatabaseWithSummaryMetadata'() {
-        final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
-                createDatabaseImportParameters(databaseHost, databasePort).tap {
-                    databaseNames = 'metadata_simple';
-                    detectEnumerations = true;
-                    maxEnumerations = 20;
-                    calculateSummaryMetadata = true;
-                })
+    void 'SM01 : Test Import Simple Database With Summary Metadata'() {
+        given:
+        setupData()
 
-        checkBasic(dataModel)
-        checkOrganisationEnumerated(dataModel)
-        checkSampleSummaryMetadata(dataModel)
-        checkBiggerSampleSummaryMetadata(dataModel)
-    }
-
-    @Test
-    void 'testImportSimpleDatabaseWithSummaryMetadataWithSampling'() {
+        when:
         final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
             createDatabaseImportParameters(databaseHost, databasePort).tap {
                 databaseNames = 'metadata_simple'
                 detectEnumerations = true
                 maxEnumerations = 20
                 calculateSummaryMetadata = true
-                sampleThreshold = 1000
-                samplePercent = 10
+                summaryMetadataUseSampling = false
+                enumerationValueUseSampling = false
+                ignoreColumnsForSummaryMetadata = '.*id'
+                ignoreColumnsForEnumerations = '.*id'
+            })
+
+        then:
+        checkBasic(dataModel)
+        checkOrganisationEnumerated(dataModel)
+        checkSampleSummaryMetadata(dataModel)
+        checkBiggerSampleSummaryMetadata(dataModel)
+    }
+
+    void 'SM02 : Test Import Simple Database With Summary Metadata With Sampling'() {
+        given:
+        setupData()
+
+        when:
+        final DataModel dataModel = importDataModelAndRetrieveFromDatabase(
+            createDatabaseImportParameters(databaseHost, databasePort).tap {
+                databaseNames = 'metadata_simple'
+                detectEnumerations = true
+                maxEnumerations = 20
+                calculateSummaryMetadata = true
+                summaryMetadataUseSampling = true
+                summaryMetadataSampleThreshold = 1000
+                summaryMetadataSamplePercent = 10
+                enumerationValueUseSampling = true
+                enumerationValueSampleThreshold = 1000
+                enumerationValueSamplePercent = 10
+                ignoreColumnsForSummaryMetadata = '.*id'
+                ignoreColumnsForEnumerations = '.*id'
             }
         )
 
+        then:
         checkBasic(dataModel)
         checkOrganisationEnumerated(dataModel)
         checkSampleSummaryMetadata(dataModel)
@@ -164,13 +203,14 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         assertTrue '15 or fewer enumeration values', sampleVarcharEnumerationType.enumerationValues.size() <= 15
         sampleVarcharEnumerationType.enumerationValues.each {
             assertTrue 'Enumeration key in expected set',
-                    ['ENUM0', 'ENUM1', 'ENUM2', 'ENUM3', 'ENUM4', 'ENUM5', 'ENUM6', 'ENUM7', 'ENUM8', 'ENUM9', 'ENUM10', 'ENUM11', 'ENUM12', 'ENUM13', 'ENUM14'].contains(it.key)
+                       ['ENUM0', 'ENUM1', 'ENUM2', 'ENUM3', 'ENUM4', 'ENUM5', 'ENUM6', 'ENUM7', 'ENUM8', 'ENUM9', 'ENUM10', 'ENUM11', 'ENUM12', 'ENUM13', 'ENUM14']
+                           .contains(it.key)
         }
     }
 
     private void checkBasic(DataModel dataModel) {
         String expectedDataBase = "metadata_simple"
-        String expectedSchema = "public";
+        String expectedSchema = "public"
         List<String> expectedTables = ["catalogue_item", "catalogue_user", "metadata", "organisation", "sample", "bigger_sample", "bigger_sample_view"]
 
         assertEquals 'Database/Model name', expectedDataBase, dataModel.label
@@ -371,29 +411,33 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         final DataClass sampleTable = dataClasses.find {it.label == 'sample'}
 
         List<String> expectedColumns = [
-                "id",
-                "sample_smallint",
-                "sample_bigint",
-                "sample_int",
-                "sample_decimal",
-                "sample_numeric",
-                "sample_date",
-                "sample_timestamp_without_tz",
-                "sample_timestamp_with_tz"
+            "id",
+            "sample_smallint",
+            "sample_bigint",
+            "sample_int",
+            "sample_decimal",
+            "sample_numeric",
+            "sample_date",
+            "sample_timestamp_without_tz",
+            "sample_timestamp_with_tz"
         ]
 
         assertEquals 'Sample Number of columns/dataElements', expectedColumns.size(), sampleTable.dataElements.size()
 
-        expectedColumns.each {columnName ->
-            DataElement de = sampleTable.dataElements.find{it.label == columnName}
+        DataElement deId = sampleTable.dataElements.find {it.label == 'id'}
+        assertEquals 'Zero summaryMetadata', 0, deId.summaryMetadata.size()
+
+        expectedColumns.findAll {it != 'id'}.each {columnName ->
+            DataElement de = sampleTable.dataElements.find {it.label == columnName}
             assertEquals 'One summaryMetadata', 1, de.summaryMetadata.size()
         }
 
         //sample_smallint
-        final DataElement sample_smallint = sampleTable.dataElements.find{it.label == "sample_smallint"}
+        final DataElement sample_smallint = sampleTable.dataElements.find {it.label == "sample_smallint"}
         assertEquals 'reportValue for sample_smallint',
-                '{"-100 - -80":20,"-80 - -60":20,"-60 - -40":20,"-40 - -20":20,"-20 - 0":20,"0 - 20":20,"20 - 40":20,"40 - 60":20,"60 - 80":20,"80 - 100":20,"100 - 120":1}',
-                sample_smallint.summaryMetadata[0].summaryMetadataReports[0].reportValue
+                     '{"-100 - -80":20,"-80 - -60":20,"-60 - -40":20,"-40 - -20":20,"-20 - 0":20,"0 - 20":20,"20 - 40":20,"40 - 60":20,"60 - 80":20,"80 - 100":20,"100 - ' +
+                     '120":1}',
+                     sample_smallint.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
         //sample_bigint
         final DataElement sample_bigint = sampleTable.dataElements.find{it.label == "sample_bigint"}
@@ -410,14 +454,16 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
         //sample_decimal
         final DataElement sample_decimal = sampleTable.dataElements.find{it.label == "sample_decimal"}
         assertEquals 'reportValue for sample_decimal',
-                '{"0.000 - 1000000.000":83,"1000000.000 - 2000000.000":36,"2000000.000 - 3000000.000":26,"3000000.000 - 4000000.000":22,"4000000.000 - 5000000.000":20,"5000000.000 - 6000000.000":14}',
-                sample_decimal.summaryMetadata[0].summaryMetadataReports[0].reportValue
+                     '{"0.00 - 1000000.00":83,"1000000.00 - 2000000.00":36,"2000000.00 - 3000000.00":26,"3000000.00 - 4000000.00":22,"4000000.00 - 5000000.00":20,"5000000' +
+                     '.00 - 6000000.00":14}',
+                     sample_decimal.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
         //sample_numeric
         final DataElement sample_numeric = sampleTable.dataElements.find{it.label == "sample_numeric"}
         assertEquals 'reportValue for sample_numeric',
-                '{"-10.000000 - -5.000000":20,"-5.000000 - 0.000000":80,"0.000000 - 5.000000":81,"5.000000 - 10.000000":20}',
-                sample_numeric.summaryMetadata[0].summaryMetadataReports[0].reportValue
+                     '{"-10.00 - -8.00":6,"-8.00 - -6.00":9,"-6.00 - -4.00":11,"-4.00 - -2.00":15,"-2.00 - 0.00":59,"0.00 - 2.00":60,"2.00 - 4.00":15,"4.00 - 6.00":11,"6.00' +
+                     ' - 8.00":9,"8.00 - 10.00":6}',
+                     sample_numeric.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
         //sample_date
         final DataElement sample_date = sampleTable.dataElements.find{it.label == "sample_date"}
@@ -426,16 +472,19 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
                 sample_date.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
         //sample_timestamp_without_tz
-        final DataElement sample_timestamp_without_tz = sampleTable.dataElements.find{it.label == "sample_timestamp_without_tz"}
+        final DataElement sample_timestamp_without_tz = sampleTable.dataElements.find {it.label == "sample_timestamp_without_tz"}
         assertEquals 'reportValue for sample_timestamp_without_tz',
-                '{"27/08/2020 - 28/08/2020":4,"28/08/2020 - 29/08/2020":24,"29/08/2020 - 30/08/2020":24,"30/08/2020 - 31/08/2020":24,"31/08/2020 - 01/09/2020":24,"01/09/2020 - 02/09/2020":24,"02/09/2020 - 03/09/2020":24,"03/09/2020 - 04/09/2020":24,"04/09/2020 - 05/09/2020":24,"05/09/2020 - 06/09/2020":5}',
-                sample_timestamp_without_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue
+                     '{"27/08/2020":4,"28/08/2020":24,"29/08/2020":24,"30/08/2020":24,"31/08/2020":24,"01/09/2020":24,"02/09/2020":24,"03/09/2020":24,"04/09/2020":24,' +
+                     '"05/09/2020":5}',
+                     sample_timestamp_without_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
         //sample_timestamp_with_tz
         //Timestamp wth timezone will give different results depending on the client timezone, so use a less strict test
-        final DataElement sample_timestamp_with_tz = sampleTable.dataElements.find{it.label == "sample_timestamp_with_tz"}
-        assertTrue 'reportValue for sample_timestamp_with_tz contains expected string',
-                sample_timestamp_with_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue.contains('"28/08/2020 - 29/08/2020":24,"29/08/2020 - 30/08/2020":24,"30/08/2020 - 31/08/2020":24,"31/08/2020 - 01/09/2020":24,"01/09/2020 - 02/09/2020":24,"02/09/2020 - 03/09/2020":24,"03/09/2020 - 04/09/2020":24,"04/09/2020 - 05/09/2020":24')
+        final DataElement sample_timestamp_with_tz = sampleTable.dataElements.find {it.label == "sample_timestamp_with_tz"}
+        assertEquals 'reportValue for sample_timestamp_with_tz',
+                     '{"27/08/2020":4,"28/08/2020":24,"29/08/2020":24,"30/08/2020":24,"31/08/2020":24,"01/09/2020":24,"02/09/2020":24,"03/09/2020":24,' +
+                     '"04/09/2020":24,"05/09/2020":5}',
+                     sample_timestamp_with_tz.summaryMetadata[0].summaryMetadataReports[0].reportValue
 
     }
 
@@ -478,10 +527,15 @@ class PostgresDatabaseDataModelImporterProviderServiceTest extends BaseDatabaseP
 
         //Map of column name to expected summary metadata description:reportValue. Expect exact counts.
         Map<String, Map<String, String>> expectedColumns = [
-                "sample_bigint": ['Value Distribution':'{"0 - 100000":99999,"100000 - 200000":100000,"200000 - 300000":100000,"300000 - 400000":100000,"400000 - 500000":100000,"500000 - 600000":1}'],
-                "sample_decimal": ['Value Distribution':'{"-1.000 - 0.000":249924,"0.000 - 1.000":245051,"1.000 - 2.000":5025}'],
-                "sample_date": ['Value Distribution':'{"24/08/2020 - 26/08/2020":91266,"26/08/2020 - 28/08/2020":56304,"28/08/2020 - 30/08/2020":43810,"30/08/2020 - 01/09/2020":39468,"01/09/2020 - 03/09/2020":38302,"03/09/2020 - 05/09/2020":39468,"05/09/2020 - 07/09/2020":43810,"07/09/2020 - 09/09/2020":56306,"09/09/2020 - 11/09/2020":91266}'],
-                "sample_varchar": ['Enumeration Value Distribution':'{"ENUM0":33333,"ENUM1":33334,"ENUM10":33333,"ENUM11":33333,"ENUM12":33333,"ENUM13":33333,"ENUM14":33333,"ENUM2":33334,"ENUM3":33334,"ENUM4":33334,"ENUM5":33334,"ENUM6":33333,"ENUM7":33333,"ENUM8":33333,"ENUM9":33333}']
+            "sample_bigint" : ['Value Distribution': '{"0 - 50000":49999,"50000 - 100000":50000,"100000 - 150000":50000,"150000 - 200000":50000,"200000 - 250000":50000,' +
+                                                     '"250000 - 300000":50000,"300000 - 350000":50000,"350000 - 400000":50000,"400000 - 450000":50000,"450000 - ' +
+                                                     '500000":50000,"500000 - 550000":1}'],
+            "sample_decimal": ['Value Distribution': '{"-1.00 - -0.80":102272,"-0.80 - -0.60":45195,"-0.60 - -0.40":36947,"-0.40 - -0.20":33440,"-0.20 - 0.00":32070,"0.00 -' +
+                                                     ' 0.20":32052,"0.20 - 0.40":33429,"0.40 - 0.60":36919,"0.60 - 0.80":45138,"0.80 - 1.00":97513,"1.00 - 1.20":5025}'],
+            "sample_date"   : ['Value Distribution': '{"24/08/2020 - 26/08/2020":91266,"26/08/2020 - 28/08/2020":56304,"28/08/2020 - 30/08/2020":43810,"30/08/2020 - ' +
+                                                     '01/09/2020":39468,"01/09/2020 - 03/09/2020":38302,"03/09/2020 - 05/09/2020":39468,"05/09/2020 - 07/09/2020":43810,' +
+                                                     '"07/09/2020 - 09/09/2020":56306,"09/09/2020 - 11/09/2020":91266}'],
+            "sample_varchar": ['Enumeration Value Distribution': '{"ENUM0":33333,"ENUM1":33334,"ENUM10":33333,"ENUM11":33333,"ENUM12":33333,"ENUM13":33333,"ENUM14":33333,"ENUM2":33334,"ENUM3":33334,"ENUM4":33334,"ENUM5":33334,"ENUM6":33333,"ENUM7":33333,"ENUM8":33333,"ENUM9":33333}']
         ]
 
         assertEquals 'Sample Number of columns/dataElements', expectedColumns.size(), sampleTable.dataElements.size()
