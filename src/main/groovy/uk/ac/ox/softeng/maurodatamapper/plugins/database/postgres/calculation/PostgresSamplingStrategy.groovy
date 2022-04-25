@@ -28,7 +28,7 @@ class PostgresSamplingStrategy extends SamplingStrategy {
         super(schema, table, samplingImporterProviderServiceParameters)
     }
 
-    boolean canSampleTypeType() {
+    boolean canSampleTableType() {
         this.tableType == 'BASE TABLE'
     }
 
