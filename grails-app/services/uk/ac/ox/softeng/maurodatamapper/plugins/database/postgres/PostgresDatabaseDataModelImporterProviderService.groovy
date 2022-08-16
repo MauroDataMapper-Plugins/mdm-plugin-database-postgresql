@@ -58,6 +58,11 @@ class PostgresDatabaseDataModelImporterProviderService
     }
 
     @Override
+    Boolean handlesContentType(String contentType) {
+        false
+    }
+
+    @Override
     String namespaceColumn() {
         "uk.ac.ox.softeng.maurodatamapper.plugins.database.postgres.column"
     }
