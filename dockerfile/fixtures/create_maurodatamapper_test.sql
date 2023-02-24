@@ -1,4 +1,4 @@
--- CREATE DATABASE maurodatamapper_test OWNER maurodatamapper;
+CREATE DATABASE maurodatamapper_test OWNER maurodatamapper;
 
 \c maurodatamapper_test;
 

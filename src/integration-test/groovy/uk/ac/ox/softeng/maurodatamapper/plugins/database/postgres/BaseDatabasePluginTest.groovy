@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 University of Oxford and Health and Social Care Information Centre, also known as NHS Digital
+ * Copyright 2020-2023 University of Oxford and NHS England
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,9 +102,6 @@ abstract class BaseDatabasePluginTest<P extends DatabaseDataModelImporterProvide
     }
 
 
-    DataModel saveDomain(DataModel domain) {
-        dataModelService.saveModelWithContent(domain)
-    }
 
     protected P createDatabaseImportParameters(String host, int port) {
         P params = createDatabaseImportParameters()
@@ -173,10 +170,7 @@ abstract class BaseDatabasePluginTest<P extends DatabaseDataModelImporterProvide
 
         if (validate) {
             log.info('Validating imported model')
-            if (dataModelService.validate(importedModel)) {
-                log.info('Saving valid imported model')
-                saveDomain(importedModel)
-            } else {
+            if (!dataModelService.validate(importedModel)) {
                 GormUtils.outputDomainErrors(getMessageSource(), importedModel)
                 fail('Domain is invalid')
             }
@@ -215,8 +209,7 @@ abstract class BaseDatabasePluginTest<P extends DatabaseDataModelImporterProvide
 
             if (validate) {
                 importedModels.each {domain ->
-                    if (domain.validate()) saveDomain(domain)
-                    else {
+                    if (!domain.validate()) {
                         GormUtils.outputDomainErrors(getMessageSource(), domain)
                         fail('Domain is invalid')
                     }
