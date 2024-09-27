@@ -1,3 +1,3 @@
-FROM postgres:12-alpine
+FROM postgres:17-alpine
 
 COPY ./fixtures /docker-entrypoint-initdb.d
